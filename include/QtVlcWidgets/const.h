@@ -16,39 +16,24 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QTVLC_WIDGETS_CONST_H
+#define QTVLC_WIDGETS_CONST_H
 
-#include <QMainWindow>
+// Time Strings
+#define MSTRTIME_MAX_SIZE 22
 
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/VlcMedia.h>
+// SoundSlider
+#define WLENGTH   80 // px
+#define WHEIGHT   22  // px
+#define SOUNDMIN  0   // %
+#define SOUNDMAX  125 // % (+6dB)
+#define SOUND_SLIDER_COLORS QStringLiteral("1;66;2;77;3;99;4;33;5;22;6;97")
 
+// SeekSlider
+#define MINIMUM 0
+#define MAXIMUM 1000
+//#define CHAPTERSSPOTSIZE 3
+#define FADEDURATION 300
+#define FADEOUTDELAY 2000
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-    
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    
-private:
-    Ui::MainWindow *ui;
-    VlcInstancePtr inst;
-    VlcMediaPlayerPtr player;
-    VlcMediaPtr media;
-
-public slots:
-    void on_actionOpen_triggered();
-    void on_position_sliderMoved(int);
-    void setPosition(const float &);
-    void on_volume_sliderMoved(int);
-};
-
-#endif // MAINWINDOW_H
+#endif // CONST_H

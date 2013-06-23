@@ -16,65 +16,62 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtCore/QUrl>
-
 #include <vlc/vlc.h>
 
-#include "QtVlc/VlcMedia.h"
-#include "QtVlc/VlcInstance.h"
+#include <QtVlc/VlcMedia.h>
 
 
-// MRL constructors
-VlcMedia::VlcMedia(const QUrl &location, libvlc_instance_t *instance) :
-    VlcMedia(location.toString(), instance)
-{}
-
-VlcMedia::VlcMedia(const QString &location, libvlc_instance_t *instance) :
-    QObject()
+// create
+VlcMediaPtr VlcMedia::new_location(const QString &location, libvlc_instance_t *instance)
 {
-    _media = libvlc_media_new_location(instance, location.toUtf8().data());
-    init();
+    auto media = libvlc_media_new_location(instance, location.toUtf8().data());
+
+    return new VlcMedia(media);
 }
 
-
-// path semi-constructors
-VlcMedia *VlcMedia::new_path(const QString &path, libvlc_instance_t *instance)
+VlcMediaPtr VlcMedia::new_path(const QString &path, libvlc_instance_t *instance)
 {
-    libvlc_media_t *media = libvlc_media_new_path(instance, path.toUtf8().data());
-    VlcMedia *proxy = new VlcMedia(media);
-    libvlc_media_release(media);
-    return proxy;
+    auto media = libvlc_media_new_path(instance, path.toUtf8().data());
+
+    return new VlcMedia(media);
 }
 
-
-// fd constructors
-VlcMedia::VlcMedia(int fd, libvlc_instance_t *instance) :
-    QObject()
+VlcMediaPtr VlcMedia::new_fd(const int &fd, libvlc_instance_t *instance)
 {
-    _media = libvlc_media_new_fd(instance, fd);
-    init();
+    auto media = libvlc_media_new_fd(instance, fd);
+
+    return new VlcMedia(media);
 }
 
+VlcMediaPtr VlcMedia::create(libvlc_media_t *media)
+{
+    libvlc_media_retain(media);
 
-// libvlc primitives
+    return new VlcMedia(media);
+}
+
 VlcMedia::VlcMedia(libvlc_media_t *media) :
     QObject(), _media(media)
 {
-    libvlc_media_retain(_media);
-    init();
+    init_events();
 }
 
+// duplicate
+VlcMediaPtr VlcMedia::duplicate()
+{
+    return new VlcMedia(libvlc_media_duplicate(_media));
+}
 
 // destructor
 VlcMedia::~VlcMedia()
 {
-    deinit();
+    kill_events();
     libvlc_media_release(_media);
 }
 
 
 // events
-inline void VlcMedia::init()
+inline void VlcMedia::init_events()
 {
     _evm = libvlc_media_event_manager(_media);
 
@@ -88,7 +85,7 @@ inline void VlcMedia::init()
 #undef ATTACH
 }
 
-inline void VlcMedia::deinit()
+inline void VlcMedia::kill_events()
 {
 #define DETACH(event_type) libvlc_event_detach(_evm, event_type, &VlcMedia::libvlc_event_cb, this)
     DETACH(libvlc_MediaMetaChanged);

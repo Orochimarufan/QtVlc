@@ -21,6 +21,8 @@
 
 #include <QtWidgets/QFileDialog>
 
+#include <QtVlc/VlcMediaPlayerAudio.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -29,21 +31,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    inst = new VlcInstance();
-    player = new VlcMediaPlayer(*inst);
+    inst = VlcInstance::create();
+    player = VlcMediaPlayer::create(inst);
+    media = nullptr;
 
-    connect(ui->btn_play, SIGNAL(clicked()), player, SLOT(play()));
-    connect(ui->btn_pause, SIGNAL(clicked()), player, SLOT(pause()));
-    connect(ui->btn_resume, SIGNAL(clicked()), player, SLOT(resume()));
-    connect(ui->btn_toggle, SIGNAL(clicked()), player, SLOT(togglePause()));
-    connect(ui->btn_stop, SIGNAL(clicked()), player, SLOT(stop()));
-    connect(player, SIGNAL(positionChanged(float)), this, SLOT(setPosition(float)));
+    player->connect(ui->btn_play, SIGNAL(clicked()), SLOT(play()));
+    player->connect(ui->btn_pause, SIGNAL(clicked()), SLOT(pause()));
+    player->connect(ui->btn_resume, SIGNAL(clicked()), SLOT(resume()));
+    player->connect(ui->btn_toggle, SIGNAL(clicked()), SLOT(togglePause()));
+    player->connect(ui->btn_stop, SIGNAL(clicked()), SLOT(stop()));
+    player->connect(SIGNAL(positionChanged(float)), this, SLOT(setPosition(float)));
 
     player->setVideoDelegate(ui->video);
+
+    ui->volume->setValue(player->audio()->volume());
 }
 
 MainWindow::~MainWindow()
 {
+    delete media;
+    delete inst;
+    ui->video->release();
     delete ui;
 }
 
@@ -52,8 +60,8 @@ void MainWindow::on_actionOpen_triggered()
     QString path = QFileDialog::getOpenFileName(this, "Open Video");
     if (path.isNull()) return;
     if (media) media->deleteLater();
-    media = VlcMedia::new_path(path, *inst);
-    player->open(*media);
+    media = VlcMedia::new_path(path, inst);
+    player->open(media);
 }
 
 void MainWindow::on_position_sliderMoved(int new_value)
@@ -63,5 +71,14 @@ void MainWindow::on_position_sliderMoved(int new_value)
 
 void MainWindow::setPosition(const float &pos)
 {
-    ui->position->setValue((int)(pos * 1000.0));
+    //ui->position->setValue((int)(pos * 1000.0));
+    auto time = player->time();
+    auto length = player->length();
+    ui->position->setPosition(pos, time, length);
+    ui->timeLabel->setDisplayPosition(pos, time, length);
+}
+
+void MainWindow::on_volume_sliderMoved(int i)
+{
+    player->audio()->setVolume(i);
 }

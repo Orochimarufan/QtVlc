@@ -20,18 +20,24 @@
 
 #include <vlc/vlc.h>
 
-#include "QtVlc/VlcMediaPlayer.h"
+#include <QtVlc/VlcMediaPlayer.h>
+#include <QtVlc/VlcMediaPlayerAudio.h>
+#include <QtVlc/VlcMediaPlayerVideo.h>
 
+QHash<libvlc_media_player_t *, QWeakPointer<VlcMediaPlayer>> VlcMediaPlayer::instances;
 
-// constructor
+// instance management
 VlcMediaPlayer::VlcMediaPlayer(libvlc_instance_t *instance) :
     QObject(), _widget(0), _delegate(nullptr)
 {
     _player = libvlc_media_player_new(instance);
+
+    _audio = new VlcMediaPlayerAudio(this);
+    _video = new VlcMediaPlayerVideo(this);
+
     init_events();
 }
 
-// libvlc primitives
 VlcMediaPlayer::VlcMediaPlayer(libvlc_media_player_t *player) :
     QObject(), _player(player), _delegate(nullptr)
 {
@@ -42,10 +48,18 @@ VlcMediaPlayer::VlcMediaPlayer(libvlc_media_player_t *player) :
     init_events();
 }
 
+void VlcMediaPlayer::deletePtr(VlcMediaPlayer *ptr)
+{
+    if (instances.contains(ptr->data()))
+        instances.remove(ptr->data());
+    delete ptr;
+}
+
 // destructor
 VlcMediaPlayer::~VlcMediaPlayer()
 {
     kill_events();
+
     libvlc_media_player_release(_player);
 }
 
@@ -96,6 +110,11 @@ inline void VlcMediaPlayer::_setVideoWidget(WId widget)
 }
 
 // position
+qint64 VlcMediaPlayer::length() const
+{
+    return libvlc_media_player_get_length(_player);
+}
+
 qint64 VlcMediaPlayer::time() const
 {
     return libvlc_media_player_get_time(_player);

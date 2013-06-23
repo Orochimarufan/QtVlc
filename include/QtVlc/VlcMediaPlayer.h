@@ -16,15 +16,20 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef VLCMEDIAPLAYER_H
-#define VLCMEDIAPLAYER_H
+#ifndef QTVLC_VLCMEDIAPLAYER_H
+#define QTVLC_VLCMEDIAPLAYER_H
 
 
 #include <QtCore/QObject>
+#include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
 #include <QtGui/qwindowdefs.h>
 
 #include <QtVlc/config.h>
 #include <QtVlc/enum.h>
+#include <QtVlc/VlcInstance.h>
+#include <QtVlc/VlcMedia.h>
+#include <QtVlc/IVlcVideoDelegate.h>
 
 
 struct libvlc_event_t;
@@ -33,24 +38,22 @@ struct libvlc_media_t;
 struct libvlc_media_player_t;
 struct libvlc_instance_t;
 
+class VlcMediaPlayer;
+class VlcMediaPlayerAudio;
+class VlcMediaPlayerVideo;
+
 
 /**
- * @brief The IVlcVideoDelegate class
- * A interface to be provided by Video Vidgets
+ * @brief A VlcMediaPlayer shared pointer.
  */
-class VlcMediaPlayer;
-class QtVlc_EXPORT IVlcVideoDelegate
-{
-public:
-    virtual ~IVlcVideoDelegate() {}
+typedef QSharedPointer<VlcMediaPlayer> VlcMediaPlayerPtr;
 
-    virtual WId request(bool b_keep_size = true, unsigned int i_width = 0,  unsigned int i_height = 0) = 0;
-    virtual void release() = 0;
-};
 
 /**
  * @brief The VlcMediaPlayer class
- * implicitly converts to/from libvlc_media_player_t *
+ * This class is no mere proxy but holds data,
+ * therefore there must only be one instance per underlying libvlc_media_player_t
+ * you should only use it by means of the VlcMediaPlayerPtr (QSharedPointer)
  */
 class QtVlc_EXPORT VlcMediaPlayer : public QObject
 {
@@ -58,21 +61,32 @@ class QtVlc_EXPORT VlcMediaPlayer : public QObject
 public:
     /**
      * @brief VlcMediaPlayer constructor
-     * Create a new VlcMediaPlayer
-     * @param instance the instance object
+     * Create a new VlcMediaPlayer instance
+     * @param instance the instance object [libvlc_instance_t *]
+     * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
      */
-    explicit VlcMediaPlayer(libvlc_instance_t *instance);
+    static VlcMediaPlayerPtr create(libvlc_instance_t *instance);
 
+    /**
+     * @brief VlcMediaPlayer constructor
+     * Create a new VlcMediaPlayer instance
+     * @param instancethe instance object [VlcInstance *]
+     * @returna QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
+     */
+    static VlcMediaPlayerPtr create(VlcInstance *instance);
 
-    // libvlc primitive
-    VlcMediaPlayer(libvlc_media_player_t *);
-    libvlc_media_player_t *libvlc_t(); // refcount is NOT increased!
-    operator libvlc_media_player_t *(); // refcount is NOT increased!
-
+    /**
+     * @brief VlcMediaPlayer constructor
+     * Create a VlcMediaPlayer instance from an existing libvlc_media_player_t pointer.
+     * If there already is an instance pointing to that libvlc_media_player_t, it gets recalled.
+     * @param player the player object [libvlc_media_player_t *]
+     * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
+     */
+    static VlcMediaPlayerPtr create(libvlc_media_player_t *player);
+    libvlc_media_player_t *data();
 
     // destructor
     virtual ~VlcMediaPlayer();
-
 
     // media
     /**
@@ -85,15 +99,23 @@ public:
      * @brief Set the current media
      * @param media the media object
      */
+    void setMedia(VlcMediaPtr media);
     void setMedia(libvlc_media_t *media);
 
     /**
      * @brief Set the current media and start playing
      * @param media the media object
      */
+    void open(VlcMediaPtr media);
     void open(libvlc_media_t *media);
 
     // position
+    /**
+     * @brief Get the media length
+     * @return the media length in ms
+     */
+    qint64 length() const;
+
     /**
      * @brief Get the current playback time
      * @return the current playback time in ms
@@ -134,8 +156,6 @@ public:
 
     /**
      * @brief Set the Video Widget Delegate
-     * WARNING: undefined behaviour when used with multiple VlcMediaPlayer
-     *          proxies per libvlc_media_player_t or direct libvlc access
      * @param delegate object implementing IVlcVideoDelegate
      */
     void setVideoDelegate(IVlcVideoDelegate *delegate);
@@ -146,7 +166,14 @@ public:
      */
     IVlcVideoDelegate *videoDelegate();
 
+    VlcMediaPlayerAudio *audio();
+    VlcMediaPlayerVideo *video();
+
+    void connect(const char *signal, const QObject *receiver, const char *slot);
+    void connect(const QObject *sender, const char *signal, const char *slot);
+
 public slots:
+    // player
     /**
      * @brief Start playback
      */
@@ -171,7 +198,7 @@ public slots:
      * @brief Stop playback
      */
     void stop();
-    
+
 signals:
     void libvlcEvent(const libvlc_event_t *);
     void mediaChanged(libvlc_media_t *);
@@ -194,6 +221,9 @@ private:
     libvlc_media_player_t *_player;
     libvlc_event_manager_t *_evm;
 
+    VlcMediaPlayerAudio *_audio;
+    VlcMediaPlayerVideo *_video;
+
     // widget
     WId _widget;
     IVlcVideoDelegate *_delegate;
@@ -204,17 +234,43 @@ private:
     void kill_events();
     static void libvlc_event_cb(const libvlc_event_t *, void *);
     void libvlc_event(const libvlc_event_t *);
+
+    // instance management
+    explicit VlcMediaPlayer(libvlc_instance_t *);
+    explicit VlcMediaPlayer(libvlc_media_player_t *);
+    static QHash<libvlc_media_player_t *, QWeakPointer<VlcMediaPlayer>> instances;
+    static void deletePtr(VlcMediaPlayer *);
 };
 
 
 // ************* inline ****************
-// libvlc primitives
-inline libvlc_media_player_t *VlcMediaPlayer::libvlc_t()
+// instance management
+inline VlcMediaPlayerPtr VlcMediaPlayer::create(libvlc_instance_t *instance)
 {
-    return _player;
+    VlcMediaPlayerPtr ptr(new VlcMediaPlayer(instance), &deletePtr);
+    instances[ptr->data()] = ptr.toWeakRef();
+    return ptr;
 }
 
-inline VlcMediaPlayer::operator libvlc_media_player_t *()
+inline VlcMediaPlayerPtr VlcMediaPlayer::create(VlcInstance *instance)
+{
+    return create(instance->data());
+}
+
+inline VlcMediaPlayerPtr VlcMediaPlayer::create(libvlc_media_player_t *player)
+{
+    if (instances.contains(player))
+        return instances[player].toStrongRef();
+    else
+    {
+        VlcMediaPlayerPtr ptr(new VlcMediaPlayer(player), &deletePtr);
+        instances[player] = ptr.toWeakRef();
+        return ptr;
+    }
+}
+
+// libvlc primitives
+inline libvlc_media_player_t *VlcMediaPlayer::data()
 {
     return _player;
 }
@@ -224,6 +280,17 @@ inline void VlcMediaPlayer::open(libvlc_media_t *media)
 {
     setMedia(media);
     play();
+}
+
+inline void VlcMediaPlayer::open(VlcMediaPtr media)
+{
+    setMedia(media);
+    play();
+}
+
+inline void VlcMediaPlayer::setMedia(VlcMediaPtr media)
+{
+    setMedia(media->data());
 }
 
 // widget
@@ -237,4 +304,26 @@ inline IVlcVideoDelegate *VlcMediaPlayer::videoDelegate()
     return _delegate;
 }
 
-#endif // VLCMEDIAPLAYER_H
+// audio/video
+inline VlcMediaPlayerAudio *VlcMediaPlayer::audio()
+{
+    return _audio;
+}
+
+inline VlcMediaPlayerVideo *VlcMediaPlayer::video()
+{
+    return _video;
+}
+
+// connect
+inline void VlcMediaPlayer::connect(const char *signal, const QObject *receiver, const char *slot)
+{
+    QObject::connect(this, signal, receiver, slot);
+}
+
+inline void VlcMediaPlayer::connect(const QObject *sender, const char *signal, const char *slot)
+{
+    QObject::connect(sender, signal, slot);
+}
+
+#endif // QTVLC_VLCMEDIAPLAYER_H

@@ -16,39 +16,23 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QTVLC_VLCMEDIAPLAYERVIDEO_H
+#define QTVLC_VLCMEDIAPLAYERVIDEO_H
 
-#include <QMainWindow>
+#include <QtCore/QObject>
+#include <QtVlc/config.h>
 
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/VlcMedia.h>
+class VlcMediaPlayer;
 
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class QtVlc_EXPORT VlcMediaPlayerVideo : public QObject
 {
     Q_OBJECT
-    
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    
 private:
-    Ui::MainWindow *ui;
-    VlcInstancePtr inst;
-    VlcMediaPlayerPtr player;
-    VlcMediaPtr media;
+    VlcMediaPlayer *player;
 
-public slots:
-    void on_actionOpen_triggered();
-    void on_position_sliderMoved(int);
-    void setPosition(const float &);
-    void on_volume_sliderMoved(int);
+    VlcMediaPlayerVideo(VlcMediaPlayer *player);
+
+    friend class VlcMediaPlayer;
 };
 
-#endif // MAINWINDOW_H
+#endif // QTVLC_VLCMEDIAPLAYERVIDEO_H

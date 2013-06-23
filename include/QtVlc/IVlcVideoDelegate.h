@@ -16,39 +16,23 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QTVLC_IVLCVIDEODELEGATE_H
+#define QTVLC_IVLCVIDEODELEGATE_H
 
-#include <QMainWindow>
-
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/VlcMedia.h>
+#include <QtVlc/config.h>
 
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+/**
+ * @brief The IVlcVideoDelegate class
+ * A interface to be provided by Video Vidgets
+ */
+class QtVlc_EXPORT IVlcVideoDelegate
 {
-    Q_OBJECT
-    
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-    
-private:
-    Ui::MainWindow *ui;
-    VlcInstancePtr inst;
-    VlcMediaPlayerPtr player;
-    VlcMediaPtr media;
+    virtual ~IVlcVideoDelegate() {}
 
-public slots:
-    void on_actionOpen_triggered();
-    void on_position_sliderMoved(int);
-    void setPosition(const float &);
-    void on_volume_sliderMoved(int);
+    virtual WId request(bool b_keep_size = true, unsigned int i_width = 0,  unsigned int i_height = 0) = 0;
+    virtual void release() = 0;
 };
 
-#endif // MAINWINDOW_H
+#endif // QTVLC_IVLCVIDEODELEGATE_H

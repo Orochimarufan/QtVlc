@@ -26,18 +26,19 @@
 
 struct libvlc_instance_t;
 
+class VlcInstance;
+typedef VlcInstance * VlcInstancePtr;
+
 class QtVlc_EXPORT VlcInstance : public QObject
 {
     Q_OBJECT
 public:
     // create new
-    explicit VlcInstance();
-    explicit VlcInstance(const QStringList &args);
+    static VlcInstancePtr create(const QStringList &args = QStringList());
 
     // libvlc primitive
-    VlcInstance(libvlc_instance_t *);
-    libvlc_instance_t *libvlc_t(); // refcount is NOT increased!
-    operator libvlc_instance_t *(); // refcount not increased either!
+    static VlcInstancePtr create(libvlc_instance_t *);
+    libvlc_instance_t *data(); // refcount is NOT increased!
 
     virtual ~VlcInstance();
 
@@ -55,17 +56,25 @@ public:
     static QString QtVlc_build_qt_version();
 
 private:
+    explicit VlcInstance(const QStringList &args);
+    explicit VlcInstance(libvlc_instance_t *);
+
     libvlc_instance_t *_instance;
 };
 
 // ************* inline ****************
-// libvlc primitives
-inline libvlc_instance_t *VlcInstance::libvlc_t()
+// create
+inline VlcInstancePtr VlcInstance::create(const QStringList &args)
 {
-    return _instance;
+    return new VlcInstance(args);
 }
 
-inline VlcInstance::operator libvlc_instance_t *()
+inline VlcInstancePtr VlcInstance::create(libvlc_instance_t *inst)
+{
+    return new VlcInstance(inst);
+}
+
+inline libvlc_instance_t *VlcInstance::data()
 {
     return _instance;
 }

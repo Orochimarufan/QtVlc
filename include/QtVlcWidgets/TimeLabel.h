@@ -42,73 +42,81 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QTVLC_WIDGETS_VLCVIDEOWIDGET_H
-#define QTVLC_WIDGETS_VLCVIDEOWIDGET_H
+#ifndef TIMELABEL_H
+#define TIMELABEL_H
 
-#include <QtWidgets/QFrame>
-#include <QtVlc/IVlcVideoDelegate.h>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QLabel>
 
 #include <QtVlcWidgets/config.h>
+#include <QtVlcWidgets/const.h>
 
-/**
- * @brief The VlcVideoWidget class
- * A simple IVlcVideoDelegate implementation in qt
- */
-class QtVlcWidgets_EXPORT VlcVideoWidget : public QFrame, public IVlcVideoDelegate
+class QtVlcWidgets_EXPORT ClickableQLabel : public QLabel
 {
     Q_OBJECT
+
 public:
-    explicit VlcVideoWidget( QWidget *parent = 0, QWidget *default_widget = nullptr);
-    virtual ~VlcVideoWidget();
+    explicit ClickableQLabel(QWidget *parent = 0) : QLabel(parent)
+    {}
 
-    WId request(bool, unsigned int, unsigned int);
-    void release();
-    void sync();
-
-protected:
-    //virtual QPaintEngine *paintEngine() const { return nullptr; }
-
-private:
-    QWidget *stable;
-    QLayout *layout;
-    QWidget *default_widget;
+    virtual void mouseDoubleClickEvent(QMouseEvent *e)
+    {
+        Q_UNUSED(e);
+        emit doubleClicked();
+    }
 
 signals:
-    void sizeChanged(unsigned int, unsigned int);
-
-public slots:
-    void setSize(unsigned int, unsigned int);
+    void doubleClicked();
 };
 
-
-/**
- * @brief The VlcPrimitiveBackgroundWidget class
- * A simple Widget for use as VlcVideoWidget's default_widget
- */
-class QtVlcWidgets_EXPORT VlcPrimitiveBackgroundWidget : public QWidget
+class QtVlcWidgets_EXPORT TimeLabel : public ClickableQLabel
 {
     Q_OBJECT
 public:
-    explicit VlcPrimitiveBackgroundWidget(QString path, QWidget *parent = 0);
-    virtual ~VlcPrimitiveBackgroundWidget();
+    enum Display
+    {
+        Elapsed,
+        Remaining,
+        Both
+    };
 
-    QString path() const;
+    TimeLabel(QWidget *parent = 0, TimeLabel::Display _displayType = TimeLabel::Both);
 
 protected:
-    void paintEvent(QPaintEvent *);
-    bool b_expandPixmap = false;
-
-public slots:
-    void setPath(QString);
+    virtual void mousePressEvent(QMouseEvent *event)
+    {
+        if(displayType == TimeLabel::Elapsed) return;
+        toggleTimeDisplay();
+        event->accept();
+    }
+    virtual void mouseDoubleClickEvent(QMouseEvent *event)
+    {
+        if(displayType != TimeLabel::Both) return;
+        event->accept();
+        toggleTimeDisplay();
+        ClickableQLabel::mouseDoubleClickEvent(event);
+    }
 
 private:
-    QString _path;
+    bool b_remainingTime;
+    int cachedLength;
+    QTimer *bufTimer;
+
+    bool buffering;
+    bool showBuffering;
+    float bufVal;
+    TimeLabel::Display displayType;
+
+    char psz_length[MSTRTIME_MAX_SIZE];
+    char psz_time[MSTRTIME_MAX_SIZE];
+    void toggleTimeDisplay();
+    void paintEvent(QPaintEvent*);
+
+public slots:
+    void setDisplayPosition(float pos, qint64 time, qint64 length);
+    void setDisplayPosition(float pos);
+    void updateBuffering(float);
+    void updateBuffering();
 };
 
-// inline
-inline QString VlcPrimitiveBackgroundWidget::path() const
-{
-    return _path;
-}
-
-#endif // QTVLC_WIDGETS_VLCVIDEOWIDGET_H
+#endif // TIMELABEL_H

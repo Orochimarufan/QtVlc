@@ -40,14 +40,6 @@ VlcInstance::VlcInstance(const QStringList &args) :
     // don't need to libvlc_retain(), libvlc_new() has refcount == 1
 }
 
-VlcInstance::VlcInstance()
-{
-    const char *argv[] = {"--intf=dummy", "--no-media-library", "--no-plugins-cache"};
-    _instance = libvlc_new(3, (char **)argv);
-    if (_instance) qDebug("initalized libvlc");
-    else abort();
-}
-
 // libvlc primitive
 VlcInstance::VlcInstance(libvlc_instance_t *libvlc_t) :
     QObject(), _instance(libvlc_t)

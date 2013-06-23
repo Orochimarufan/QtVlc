@@ -18,14 +18,14 @@
 /* ATTENTION: this is GPL, not LGPL due to code from the VLC Qt Interface.
  * Original License: */
 /*****************************************************************************
- * interface_widgets.hpp : Custom widgets for the main interface
+ * input_slider.hpp : VolumeSlider and SeekSlider
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
- * $Id: d4be935f82d11b2016afa897470dec1fe90013a6 $
+ * Copyright (C) 2006-2011 the VideoLAN team
+ * $Id: 00b7b19daf5c48a10936a4d8b8943f1d2f8b48ae $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
- *          Rafaël Carré <funman@videolanorg>
+ *          Ludovic Fauvet <etix@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,77 +38,64 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QTVLC_WIDGETS_VLCVIDEOWIDGET_H
-#define QTVLC_WIDGETS_VLCVIDEOWIDGET_H
+#ifndef QTVLC_WIDGETS_SOUNDSLIDER_H
+#define QTVLC_WIDGETS_SOUNDSLIDER_H
 
-#include <QtWidgets/QFrame>
-#include <QtVlc/IVlcVideoDelegate.h>
+#include <QtWidgets/QAbstractSlider>
+#include <QtGui/QPainter>
 
 #include <QtVlcWidgets/config.h>
+#include <QtVlcWidgets/const.h>
 
-/**
- * @brief The VlcVideoWidget class
- * A simple IVlcVideoDelegate implementation in qt
- */
-class QtVlcWidgets_EXPORT VlcVideoWidget : public QFrame, public IVlcVideoDelegate
+/* Sound Slider inherited directly from QAbstractSlider */
+class QtVlcWidgets_EXPORT SoundSlider : public QAbstractSlider
 {
     Q_OBJECT
 public:
-    explicit VlcVideoWidget( QWidget *parent = 0, QWidget *default_widget = nullptr);
-    virtual ~VlcVideoWidget();
-
-    WId request(bool, unsigned int, unsigned int);
-    void release();
-    void sync();
-
-protected:
-    //virtual QPaintEngine *paintEngine() const { return nullptr; }
-
-private:
-    QWidget *stable;
-    QLayout *layout;
-    QWidget *default_widget;
-
-signals:
-    void sizeChanged(unsigned int, unsigned int);
+    SoundSlider(QWidget *_parent) : SoundSlider(_parent, 1.0, SOUND_SLIDER_COLORS) {}
+    SoundSlider(QWidget *_parent, float _i_step, QString psz_colors, int max = SOUNDMAX );
+    void setMuted( bool ); /* Set Mute status */
 
 public slots:
-    void setSize(unsigned int, unsigned int);
-};
-
-
-/**
- * @brief The VlcPrimitiveBackgroundWidget class
- * A simple Widget for use as VlcVideoWidget's default_widget
- */
-class QtVlcWidgets_EXPORT VlcPrimitiveBackgroundWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit VlcPrimitiveBackgroundWidget(QString path, QWidget *parent = 0);
-    virtual ~VlcPrimitiveBackgroundWidget();
-
-    QString path() const;
+    void volumeChanged(const int &volume, const bool &muted)
+    {
+        setValue(volume);
+        setMuted(muted);
+    }
 
 protected:
-    void paintEvent(QPaintEvent *);
-    bool b_expandPixmap = false;
+    const static int paddingL = 3;
+    const static int paddingR = 2;
 
-public slots:
-    void setPath(QString);
+    virtual void paintEvent( QPaintEvent *);
+    virtual void wheelEvent( QWheelEvent *event );
+    virtual void mousePressEvent( QMouseEvent * );
+    virtual void mouseMoveEvent( QMouseEvent * );
+    virtual void mouseReleaseEvent( QMouseEvent * );
+
+    void processReleasedButton();
 
 private:
-    QString _path;
+    bool isSliding; /* Whether we are currently sliding by user action */
+    bool b_mouseOutside; /* Whether the mouse is outside or inside the Widget */
+    int i_oldvalue; /* Store the old Value before changing */
+    float f_step; /* How much do we increase each time we wheel */
+    bool b_isMuted;
+
+    QPixmap pixGradient; /* Gradient pix storage */
+    QPixmap pixGradient2; /* Muted Gradient pix storage */
+    QPixmap pixOutside; /* OutLine pix storage */
+    QPainter painter;
+    QColor background;
+    QColor foreground;
+    QFont textfont;
+    QRect textrect;
+
+    void changeValue( int x ); /* Function to modify the value from pixel x() */
 };
 
-// inline
-inline QString VlcPrimitiveBackgroundWidget::path() const
-{
-    return _path;
-}
-
-#endif // QTVLC_WIDGETS_VLCVIDEOWIDGET_H
+#endif

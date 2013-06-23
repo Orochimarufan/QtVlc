@@ -18,14 +18,34 @@
 
 SET(QtVlcWidgets_SOURCES
 VlcVideoWidget.cpp
+TimeLabel.cpp
+TimeTooltip.cpp
+SeekStyle.cpp
+SeekSlider.cpp
+SoundSlider.cpp
 )
 
 SET(QtVlcWidgets_HEADERS
+../include/QtVlcWidgets/config.h
+../include/QtVlcWidgets/const.h
 ../include/QtVlcWidgets/VlcVideoWidget.h
+../include/QtVlcWidgets/TimeLabel.h
+../include/QtVlcWidgets/TimeTooltip.h
+../include/QtVlcWidgets/SeekSlider.h
+../include/QtVlcWidgets/SoundSlider.h
 )
 
+SET(QtVlcWidgets_HEADERS_PRIVATE
+SeekStyle.h
+)
+
+SET(QtVlcWidgets_RESOURCES
+../vlc/modules/gui/qt4/vlc.qrc
+)
+
+QT5_ADD_RESOURCES(QtVlcWidgets_RCC ${QtVlcWidgets_RESOURCES})
 add_definitions(-DQtVlcWidgets_LIBRARY)
-add_library(QtVlcWidgets SHARED ${QtVlcWidgets_SOURCES} ${QtVlcWidgets_HEADERS})
+add_library(QtVlcWidgets SHARED ${QtVlcWidgets_SOURCES} ${QtVlcWidgets_HEADERS} ${QtVlcWidgets_HEADERS_PRIVATE} ${QtVlcWidgets_RCC})
 QT5_USE_MODULES(QtVlcWidgets Core Gui Widgets)
 target_link_libraries(QtVlcWidgets ${QtVlc_LIBRARY})
 

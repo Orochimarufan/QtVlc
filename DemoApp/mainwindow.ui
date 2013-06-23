@@ -34,15 +34,16 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QSlider" name="position">
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
+       <widget class="SeekSlider" name="position">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="TimeLabel" name="timeLabel">
+        <property name="text">
+         <string>TextLabel</string>
         </property>
        </widget>
       </item>
@@ -98,6 +99,9 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="SoundSlider" name="volume"/>
+      </item>
      </layout>
     </item>
    </layout>
@@ -138,6 +142,21 @@
    <extends>QFrame</extends>
    <header location="global">QtVlcWidgets/VlcVideoWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TimeLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">QtVlcWidgets/TimeLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SeekSlider</class>
+   <extends>QSlider</extends>
+   <header location="global">QtVlcWidgets/SeekSlider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SoundSlider</class>
+   <extends>QSlider</extends>
+   <header location="global">QtVlcWidgets/SoundSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

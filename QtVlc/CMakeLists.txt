@@ -20,6 +20,8 @@ SET(QtVlc_SOURCES
 VlcInstance.cpp
 VlcMedia.cpp
 VlcMediaPlayer.cpp
+VlcMediaPlayerAudio.cpp
+VlcMediaPlayerVideo.cpp
 )
 
 SET(QtVlc_HEADERS
@@ -28,6 +30,9 @@ SET(QtVlc_HEADERS
 ../include/QtVlc/VlcInstance.h
 ../include/QtVlc/VlcMedia.h
 ../include/QtVlc/VlcMediaPlayer.h
+../include/QtVlc/IVlcVideoDelegate.h
+../include/QtVlc/VlcMediaPlayerAudio.h
+../include/QtVlc/VlcMediaPlayerVideo.h
 )
 
 

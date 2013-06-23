@@ -20,68 +20,117 @@
 #define VLCMEDIA_H
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include <QtVlc/config.h>
 #include <QtVlc/enum.h>
 
-class QUrl;
+#include <QtVlc/VlcInstance.h>
 
-struct libvlc_instance_t;
 struct libvlc_media_t;
 struct libvlc_event_manager_t;
 struct libvlc_event_t;
 struct libvlc_media_stats_t;
 
+class VlcMedia;
+typedef VlcMedia * VlcMediaPtr;
+
 class QtVlc_EXPORT VlcMedia : public QObject
 {
     Q_OBJECT
 public:
-    // from MRL
-    explicit VlcMedia(const QString &location, libvlc_instance_t *instance);
-    explicit VlcMedia(const QUrl &location, libvlc_instance_t *instance);
+    // from location
+    static VlcMediaPtr new_location(const QString &location, libvlc_instance_t *instance);
+    static VlcMediaPtr new_location(const QString &location, VlcInstancePtr instance);
+    static VlcMediaPtr new_location(const QUrl &location, libvlc_instance_t *instance);
+    static VlcMediaPtr new_location(const QUrl &location, VlcInstancePtr instance);
 
     // from path
-    static VlcMedia *new_path(const QString &path, libvlc_instance_t *instance);
+    static VlcMediaPtr new_path(const QString &path, libvlc_instance_t *instance);
+    static VlcMediaPtr new_path(const QString &path, VlcInstancePtr instance);
 
     // from fd
-    explicit VlcMedia(int fd, libvlc_instance_t *instance);
+    static VlcMediaPtr new_fd(const int &fd, libvlc_instance_t *instance);
+    static VlcMediaPtr new_fd(const int &fd, VlcInstancePtr instance);
 
     // duplicate
-    VlcMedia *duplicate();
-
+    VlcMediaPtr duplicate();
 
     // libvlc primitive
-    VlcMedia(libvlc_media_t *);
-    libvlc_media_t *libvlc_t(); // refcount is NOT increased!
-    operator libvlc_media_t *(); // refcount is NOT increased!
-
+    static VlcMediaPtr create(libvlc_media_t *);
+    libvlc_media_t *data(); // refcount is NOT increased!
 
     // destructor
     virtual ~VlcMedia();
 
-
-    // location
+    /**
+     * @brief Get the media MRL
+     * @return the MRL
+     */
     QString mrl();
 
-
-    // Meta
+    // meta
+    /**
+     * @brief Get media metadata
+     * @param meta the metadata type to get
+     * @return the metadata value
+     */
     QString meta(VlcMeta::Type meta);
+
+    /**
+     * @brief Set media metadata
+     * @param meta the metadata type to set
+     * @param value the new metadata value
+     */
     void setMeta(VlcMeta::Type meta, QString value);
+
+    /**
+     * @brief Save metadata to file (if possible)
+     * @return whether it succeeded
+     */
     bool saveMeta();
+
+    /**
+     * @brief Parse the metadata contained in the pointed file
+     * @param async whether or not to parse it asynchronously
+     * parsedChanged() will be emitted when an async parse succeeds and
+     * it wasn't parsed already. use isParsed() to determine that before calling.
+     */
     void parse(bool async = true);
+
+    /**
+     * @brief Get whether or not this media is parsed
+     * @return wether or not this media is parsed
+     */
     bool isParsed();
 
-
-    // State
+    // state
+    /**
+     * @brief Get the current playback state of this media.
+     * @return the playback state
+     */
     VlcState::Type state();
 
 
     // duration
+    /**
+     * @brief Get the media duration
+     * @return the media duration (in ms)
+     */
     qint64 duration();
 
 
     // user data
+    /**
+     * @brief Set the user data
+     * @param the data
+     */
     void setVlcUserData(void *data);
+
+    /**
+     * @brief Get the user data
+     * @return the data
+     */
     void *vlcUserData();
 
 
@@ -106,21 +155,43 @@ private:
     libvlc_media_t *_media;
     libvlc_event_manager_t *_evm;
 
+    explicit VlcMedia(libvlc_media_t *); // does not refcount-increase!
+
     // events
-    void init();
-    void deinit();
+    void init_events();
+    void kill_events();
     static void libvlc_event_cb(const libvlc_event_t *, void *);
     void libvlc_event(const libvlc_event_t *);
 };
 
 // ************* inline ****************
-// libvlc primitives
-inline libvlc_media_t *VlcMedia::libvlc_t()
+// create
+inline VlcMediaPtr VlcMedia::new_location(const QString &location, VlcInstancePtr instance)
 {
-    return _media;
+    return new_location(location, instance->data());
 }
 
-inline VlcMedia::operator libvlc_media_t *()
+inline VlcMediaPtr VlcMedia::new_location(const QUrl &location, VlcInstancePtr instance)
+{
+    return new_location(location.toString(), instance->data());
+}
+
+inline VlcMediaPtr VlcMedia::new_location(const QUrl &location, libvlc_instance_t *instance)
+{
+    return new_location(location.toString(), instance);
+}
+
+inline VlcMediaPtr VlcMedia::new_path(const QString &path, VlcInstancePtr instance)
+{
+    return new_path(path, instance->data());
+}
+
+inline VlcMediaPtr VlcMedia::new_fd(const int &fd, VlcInstancePtr instance)
+{
+    return new_fd(fd, instance->data());
+}
+
+inline libvlc_media_t *VlcMedia::data()
 {
     return _media;
 }
