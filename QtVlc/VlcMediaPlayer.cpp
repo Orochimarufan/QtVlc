@@ -16,304 +16,171 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtCore/QObject>
-
-#include <vlc/vlc.h>
-
 #include <QtVlc/VlcMediaPlayer.h>
+#include <QtVlc/VlcInstance.h>
+#include <QtVlc/VlcMedia.h>
 #include <QtVlc/VlcMediaPlayerAudio.h>
-#include <QtVlc/VlcMediaPlayerVideo.h>
 
-QHash<libvlc_media_player_t *, QWeakPointer<VlcMediaPlayer>> VlcMediaPlayer::instances;
+#include "VlcMediaPlayer_p.h"
 
-// instance management
-VlcMediaPlayer::VlcMediaPlayer(libvlc_instance_t *instance) :
-    QObject(), _widget(0), _delegate(nullptr)
+void VlcMediaPlayer::d_connect()
 {
-    _player = libvlc_media_player_new(instance);
+#define SIG(signal) connect(d, signal, signal)
+    SIG(SIGNAL(libvlcEvent(const libvlc_event_t *)));
+    SIG(SIGNAL(mediaChanged(libvlc_media_t *)));
+    SIG(SIGNAL(buffering(const float &)));
+    SIG(SIGNAL(stateChanged(const VlcState::Type &)));
+    SIG(SIGNAL(forward()));
+    SIG(SIGNAL(backward()));
+    SIG(SIGNAL(endReached()));
+    SIG(SIGNAL(encounteredError()));
+    SIG(SIGNAL(timeChanged(const qint64 &)));
+    SIG(SIGNAL(positionChanged(const float &)));
+    SIG(SIGNAL(seekableChanged(const int &)));
+    SIG(SIGNAL(pausableChanged(const int &)));
+    SIG(SIGNAL(titleChanged(const int &)));
+    SIG(SIGNAL(snapshotTaken(const QString &)));
+    SIG(SIGNAL(lengthChanged(const qint64 &)));
+    SIG(SIGNAL(voutChanged(const int &)));
+#undef SIG
+}
 
-    _audio = new VlcMediaPlayerAudio(this);
-    _video = new VlcMediaPlayerVideo(this);
+VlcMediaPlayer::VlcMediaPlayer(const VlcMediaPlayer &o) :
+    QObject(), d(o.d)
+{
+    d->retain();
+    d_connect();
+}
 
-    init_events();
+VlcMediaPlayer::VlcMediaPlayer(const VlcInstance &instance) :
+    QObject()
+{
+    d = new VlcMediaPlayerPrivate(getref<VlcInstance>(instance)->data());
+    d_connect();
+}
+
+VlcMediaPlayer::VlcMediaPlayer(libvlc_instance_t *instance) :
+    QObject()
+{
+    d = new VlcMediaPlayerPrivate(instance);
+    d_connect();
 }
 
 VlcMediaPlayer::VlcMediaPlayer(libvlc_media_player_t *player) :
-    QObject(), _player(player), _delegate(nullptr)
+    QObject()
 {
-    libvlc_media_player_retain(_player);
-
-    _widget = videoWidget();
-
-    init_events();
+    d = VlcMediaPlayerPrivate::instance(player);
+    d_connect();
 }
 
-void VlcMediaPlayer::deletePtr(VlcMediaPlayer *ptr)
-{
-    if (instances.contains(ptr->data()))
-        instances.remove(ptr->data());
-    delete ptr;
-}
-
-// destructor
 VlcMediaPlayer::~VlcMediaPlayer()
 {
-    kill_events();
-
-    libvlc_media_player_release(_player);
+    d->release();
 }
 
-
-// media
-libvlc_media_t *VlcMediaPlayer::media()
+libvlc_media_player_t *VlcMediaPlayer::data()
 {
-    return libvlc_media_player_get_media(_player);
+    return d->data();
 }
 
 void VlcMediaPlayer::setMedia(libvlc_media_t *media)
 {
-    libvlc_media_player_set_media(_player, media);
+    d->setMedia(media);
 }
 
-// widget
-WId VlcMediaPlayer::videoWidget()
+VlcMedia VlcMediaPlayer::media()
 {
-#if defined(Q_OS_WIN32)
-    return (WId) libvlc_media_player_get_hwnd(_player);
-#elif defined(Q_OS_MAC)
-    return libvlc_media_player_get_nsobject(_player);
-#elif defined(Q_OS_UNIX)
-    return libvlc_media_player_get_xwindow(_player);
-#else
-    qDebug("Uknown platform!!!");
-    return 0;
-#endif
+    return VlcMedia(d->media());
 }
 
-void VlcMediaPlayer::setVideoWidget(WId widget)
+libvlc_media_t *VlcMediaPlayer::media_()
 {
-    if (_delegate == nullptr)
-        _widget = widget;
+    return d->media();
 }
 
-inline void VlcMediaPlayer::_setVideoWidget(WId widget)
+void VlcMediaPlayer::open(libvlc_media_t *media)
 {
-#if defined(Q_OS_WIN32)
-    libvlc_media_player_set_hwnd(_player, (void *) widget);
-#elif defined(Q_OS_MAC)
-    libvlc_media_player_set_nsobject(_player, widget);
-#elif defined(Q_OS_UNIX)
-    libvlc_media_player_set_xwindow(_player, widget);
-#else
-    qDebug("Unknown Platform!!!");
-#endif
+    d->setMedia(media);
+    d->play();
 }
 
-// position
+void VlcMediaPlayer::open(const VlcMedia &media)
+{
+    d->setMedia(getref<VlcMedia>(media)->data());
+    d->play();
+}
+
 qint64 VlcMediaPlayer::length() const
 {
-    return libvlc_media_player_get_length(_player);
+    return d->length();
 }
 
 qint64 VlcMediaPlayer::time() const
 {
-    return libvlc_media_player_get_time(_player);
+    return d->time();
 }
 
 void VlcMediaPlayer::setTime(const qint64 &time)
 {
-    libvlc_media_player_set_time(_player, time);
+    d->setTime(time);
 }
 
 float VlcMediaPlayer::position() const
 {
-    return libvlc_media_player_get_position(_player);
+    return d->position();
 }
 
-void VlcMediaPlayer::setPosition(const float &pos)
+void VlcMediaPlayer::setPosition(const float &position)
 {
-    libvlc_media_player_set_position(_player, pos);
+    d->setPosition(position);
 }
 
-
-// events
-void VlcMediaPlayer::libvlc_event_cb(const libvlc_event_t *e, void *o)
+void VlcMediaPlayer::setVideoWidget(WId widget)
 {
-    QObject *object = static_cast<QObject *>(o);
-    VlcMediaPlayer *player = qobject_cast<VlcMediaPlayer *>(object);
-    if (player)
-        player->libvlc_event(e);
+    d->setVideoWidget(widget);
 }
 
-inline void VlcMediaPlayer::libvlc_event(const libvlc_event_t *e)
+void VlcMediaPlayer::setVideoDelegate(IVlcVideoDelegate *delegate)
 {
-    emit libvlcEvent(e);
-
-    switch(e->type)
-    {
-    case libvlc_MediaPlayerMediaChanged:
-        emit mediaChanged(e->u.media_player_media_changed.new_media);
-        break;
-    case libvlc_MediaPlayerNothingSpecial:
-        emit stateChanged(VlcState::NothingSpecial);
-        break;
-    case libvlc_MediaPlayerOpening:
-        emit stateChanged(VlcState::Opening);
-        break;
-    case libvlc_MediaPlayerBuffering:
-        emit stateChanged(VlcState::Buffering);
-        emit buffering(e->u.media_player_buffering.new_cache);
-        break;
-    case libvlc_MediaPlayerPlaying:
-        emit stateChanged(VlcState::Playing);
-        break;
-    case libvlc_MediaPlayerPaused:
-        emit stateChanged(VlcState::Paused);
-        break;
-    case libvlc_MediaPlayerStopped:
-        emit stateChanged(VlcState::Stopped);
-        break;
-    case libvlc_MediaPlayerForward:
-        emit forward();
-        break;
-    case libvlc_MediaPlayerBackward:
-        emit backward();
-        break;
-    case libvlc_MediaPlayerEndReached:
-        emit endReached();
-        break;
-    case libvlc_MediaPlayerEncounteredError:
-        emit encounteredError();
-        break;
-    case libvlc_MediaPlayerTimeChanged:
-        emit timeChanged(e->u.media_player_time_changed.new_time);
-        break;
-    case libvlc_MediaPlayerPositionChanged:
-        emit positionChanged(e->u.media_player_position_changed.new_position);
-        break;
-    case libvlc_MediaPlayerSeekableChanged:
-        emit seekableChanged(e->u.media_player_seekable_changed.new_seekable);
-        break;
-    case libvlc_MediaPlayerPausableChanged:
-        emit pausableChanged(e->u.media_player_pausable_changed.new_pausable);
-        break;
-    case libvlc_MediaPlayerTitleChanged:
-        emit titleChanged(e->u.media_player_title_changed.new_title);
-        break;
-    case libvlc_MediaPlayerSnapshotTaken:
-        emit snapshotTaken(e->u.media_player_snapshot_taken.psz_filename);
-        break;
-    case libvlc_MediaPlayerLengthChanged:
-        emit lengthChanged(e->u.media_player_length_changed.new_length);
-        break;
-    case libvlc_MediaPlayerVout:
-        emit voutChanged(e->u.media_player_vout.new_count);
-        break;
-    default:
-        qDebug("VlcMediaPlayer: unknown event: %i", e->type);
-    }
+    d->setVideoDelegate(delegate);
 }
 
-inline void VlcMediaPlayer::init_events()
+WId VlcMediaPlayer::videoWidget()
 {
-    _evm = libvlc_media_player_event_manager(_player);
-
-#define ATTACH(event_type) libvlc_event_attach(_evm, event_type, &VlcMediaPlayer::libvlc_event_cb, this)
-    ATTACH(libvlc_MediaPlayerMediaChanged);
-    ATTACH(libvlc_MediaPlayerNothingSpecial);
-    ATTACH(libvlc_MediaPlayerOpening);
-    ATTACH(libvlc_MediaPlayerBuffering);
-    ATTACH(libvlc_MediaPlayerPlaying);
-    ATTACH(libvlc_MediaPlayerPaused);
-    ATTACH(libvlc_MediaPlayerStopped);
-    ATTACH(libvlc_MediaPlayerForward);
-    ATTACH(libvlc_MediaPlayerBackward);
-    ATTACH(libvlc_MediaPlayerEndReached);
-    ATTACH(libvlc_MediaPlayerEncounteredError);
-    ATTACH(libvlc_MediaPlayerTimeChanged);
-    ATTACH(libvlc_MediaPlayerPositionChanged);
-    ATTACH(libvlc_MediaPlayerSeekableChanged);
-    ATTACH(libvlc_MediaPlayerPausableChanged);
-    ATTACH(libvlc_MediaPlayerTitleChanged);
-    ATTACH(libvlc_MediaPlayerSnapshotTaken);
-    ATTACH(libvlc_MediaPlayerLengthChanged);
-    ATTACH(libvlc_MediaPlayerVout);
-#undef ATTACH
+    return d->videoWidget();
 }
 
-inline void VlcMediaPlayer::kill_events()
+IVlcVideoDelegate *VlcMediaPlayer::videoDelegate()
 {
-#define DETACH(event_type) libvlc_event_detach(_evm, event_type, &VlcMediaPlayer::libvlc_event_cb, this)
-    DETACH(libvlc_MediaPlayerMediaChanged);
-    DETACH(libvlc_MediaPlayerNothingSpecial);
-    DETACH(libvlc_MediaPlayerOpening);
-    DETACH(libvlc_MediaPlayerBuffering);
-    DETACH(libvlc_MediaPlayerPlaying);
-    DETACH(libvlc_MediaPlayerPaused);
-    DETACH(libvlc_MediaPlayerStopped);
-    DETACH(libvlc_MediaPlayerForward);
-    DETACH(libvlc_MediaPlayerBackward);
-    DETACH(libvlc_MediaPlayerEndReached);
-    DETACH(libvlc_MediaPlayerEncounteredError);
-    DETACH(libvlc_MediaPlayerTimeChanged);
-    DETACH(libvlc_MediaPlayerPositionChanged);
-    DETACH(libvlc_MediaPlayerSeekableChanged);
-    DETACH(libvlc_MediaPlayerPausableChanged);
-    DETACH(libvlc_MediaPlayerTitleChanged);
-    DETACH(libvlc_MediaPlayerSnapshotTaken);
-    DETACH(libvlc_MediaPlayerLengthChanged);
-    DETACH(libvlc_MediaPlayerVout);
-#undef DETACH
+    return d->videoDelegate();
 }
 
-
-// slots
 void VlcMediaPlayer::play()
 {
-    if (!_player) return;
-
-    if (_delegate)
-        _widget = _delegate->request(); // TODO gather size
-
-    _setVideoWidget(_widget);
-
-    libvlc_media_player_play(_player);
+    d->play();
 }
 
 void VlcMediaPlayer::pause()
 {
-    if (!_player) return;
-
-    if (libvlc_media_player_can_pause(_player))
-        libvlc_media_player_set_pause(_player, true);
+    d->setPause(true);
 }
 
 void VlcMediaPlayer::resume()
 {
-    if (!_player) return;
-
-    if (libvlc_media_player_can_pause(_player))
-        libvlc_media_player_set_pause(_player, false);
+    d->setPause(false);
 }
 
 void VlcMediaPlayer::togglePause()
 {
-    if (!_player) return;
-
-    if (libvlc_media_player_can_pause(_player))
-        libvlc_media_player_pause(_player);
+    d->pause();
 }
 
 void VlcMediaPlayer::stop()
 {
-    if (!_player) return;
+    d->stop();
+}
 
-    libvlc_media_player_stop(_player);
-
-    if (_delegate)
-    {
-        _delegate ->release();
-        _widget = 0;
-        _setVideoWidget(0);
-    }
+VlcMediaPlayerAudio VlcMediaPlayer::audio()
+{
+    return VlcMediaPlayerAudio(d);
 }

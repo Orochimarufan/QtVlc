@@ -21,87 +21,79 @@
 #include <QtVlc/VlcMediaPlayerAudio.h>
 #include <QtVlc/VlcMediaPlayer.h>
 
+#include "VlcMediaPlayer_p.h"
 
-VlcMediaPlayerAudio::VlcMediaPlayerAudio(VlcMediaPlayer *player) :
-    QObject(player), player(player)
+
+VlcMediaPlayerAudio::VlcMediaPlayerAudio(const VlcMediaPlayerAudio &o) :
+    QObject(), d(o.d)
 {
+    d->retain();
+}
+
+VlcMediaPlayerAudio::VlcMediaPlayerAudio(const VlcMediaPlayer &player) :
+    QObject()
+{
+    d = VlcMediaPlayerPrivate::instance(getref<VlcMediaPlayer>(player)->data());
+}
+
+VlcMediaPlayerAudio::VlcMediaPlayerAudio(libvlc_media_player_t *player) :
+    QObject()
+{
+    d = VlcMediaPlayerPrivate::instance(player);
+}
+
+VlcMediaPlayerAudio::VlcMediaPlayerAudio(VlcMediaPlayerPrivate *p) :
+    QObject(), d(p)
+{
+    d->retain();
 }
 
 VlcMediaPlayerAudio::~VlcMediaPlayerAudio()
 {
+    d->release();
 }
 
 int VlcMediaPlayerAudio::volume() const
 {
-    if (player->data())
-        return libvlc_audio_get_volume(player->data());
-    else
-        return -1;
+    return d->audio_volume();
 }
 
 bool VlcMediaPlayerAudio::isMuted() const
 {
-    if (player->data())
-        return libvlc_audio_get_mute(player->data());
-    else
-        return false;
+    return d->audio_isMuted();
 }
 
 void VlcMediaPlayerAudio::setTrack(const int &track)
 {
-    if (player->data())
-        libvlc_audio_set_track(player->data(), track);
+    d->audio_setTrack(track);
 }
 
 int VlcMediaPlayerAudio::track() const
 {
-    if (player->data())
-        return libvlc_audio_get_track(player->data());
-    else
-        return -1;
+    return d->audio_track();
 }
 
 int VlcMediaPlayerAudio::trackCount() const
 {
-    if (player->data())
-        return libvlc_audio_get_track_count(player->data());
-    else
-        return -1;
+    return d->audio_trackCount();
 }
 
 QHash<int, QString> VlcMediaPlayerAudio::trackDescription() const
 {
-    QHash<int, QString> descriptions;
-
-    if (player->data())
-    {
-        libvlc_track_description_t *desc = libvlc_audio_get_track_description(player->data());
-
-        descriptions[desc->i_id] = QString::fromUtf8(desc->psz_name);
-        for (int i = 1; i < trackCount(); i++)
-        {
-            desc = desc->p_next;
-            descriptions[desc->i_id] = QString::fromUtf8(desc->psz_name);
-        }
-    }
-
-    return descriptions;
+    return d->audio_trackDescription();
 }
 
 void VlcMediaPlayerAudio::setVolume(const int &volume)
 {
-    if (player->data())
-        libvlc_audio_set_volume(player->data(), volume);
+    d->audio_setVolume(volume);
 }
 
 void VlcMediaPlayerAudio::setMuted(const bool &mute)
 {
-    if (player->data())
-        libvlc_audio_set_mute(player->data(), mute);
+    d->audio_setMuted(mute);
 }
 
 void VlcMediaPlayerAudio::toggleMuted()
 {
-    if (player->data())
-        libvlc_audio_toggle_mute(player->data());
+    d->audio_toggleMuted();
 }

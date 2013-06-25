@@ -40,9 +40,9 @@ public:
     
 private:
     Ui::MainWindow *ui;
-    VlcInstancePtr inst;
-    VlcMediaPlayerPtr player;
-    VlcMediaPtr media;
+    VlcInstance *inst;
+    VlcMediaPlayer *player;
+    VlcMedia *media;
 
 public slots:
     void on_actionOpen_triggered();

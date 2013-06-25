@@ -18,10 +18,20 @@
 
 SET(QtVlc_SOURCES
 VlcInstance.cpp
+VlcInstance_p.cpp
 VlcMedia.cpp
+VlcMedia_p.cpp
 VlcMediaPlayer.cpp
+VlcMediaPlayer_p.cpp
 VlcMediaPlayerAudio.cpp
-VlcMediaPlayerVideo.cpp
+#VlcMediaPlayerVideo.cpp
+)
+
+SET(QtVlc_HEADERS_PRIVATE
+common_p.h
+VlcInstance_p.h
+VlcMedia_p.h
+VlcMediaPlayer_p.h
 )
 
 SET(QtVlc_HEADERS
@@ -32,12 +42,12 @@ SET(QtVlc_HEADERS
 ../include/QtVlc/VlcMediaPlayer.h
 ../include/QtVlc/IVlcVideoDelegate.h
 ../include/QtVlc/VlcMediaPlayerAudio.h
-../include/QtVlc/VlcMediaPlayerVideo.h
+#../include/QtVlc/VlcMediaPlayerVideo.h
 )
 
 
 add_definitions(-DQtVlc_LIBRARY)
-add_library(QtVlc SHARED ${QtVlc_SOURCES} ${QtVlc_HEADERS})
+add_library(QtVlc SHARED ${QtVlc_SOURCES} ${QtVlc_HEADERS} ${QtVlc_HEADERS_PRIVATE})
 QT5_USE_MODULES(QtVlc Core)
 #target_link_libraries(QtVlc ${LIBVLC_LIBRARIES} ${LIBVLCCORE_LIBRARIES})
 target_link_libraries(QtVlc ${LIBVLC_LIBRARIES})

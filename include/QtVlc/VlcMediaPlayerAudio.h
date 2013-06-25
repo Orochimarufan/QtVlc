@@ -24,12 +24,23 @@
 
 #include <QtVlc/config.h>
 
+struct libvlc_media_player_t;
 class VlcMediaPlayer;
+class VlcMediaPlayerPrivate;
 
 class QtVlc_EXPORT VlcMediaPlayerAudio : public QObject
 {
     Q_OBJECT
+    VlcMediaPlayerPrivate *d;
+
 public:
+    VlcMediaPlayerAudio(const VlcMediaPlayerAudio &);
+    VlcMediaPlayerAudio(libvlc_media_player_t *player);
+    VlcMediaPlayerAudio(const VlcMediaPlayer &);
+    VlcMediaPlayerAudio(VlcMediaPlayerPrivate *);
+
+    virtual ~VlcMediaPlayerAudio();
+
     /**
      * @brief Get the audio volume
      * @return the audio volume (in %)
@@ -57,15 +68,6 @@ public:
     int trackCount() const;
 
     QHash<int, QString> trackDescription() const;
-
-private:
-    VlcMediaPlayer *player;
-
-    VlcMediaPlayerAudio(VlcMediaPlayer *player);
-
-    virtual ~VlcMediaPlayerAudio();
-
-    friend class VlcMediaPlayer;
 
 public slots:
     /**

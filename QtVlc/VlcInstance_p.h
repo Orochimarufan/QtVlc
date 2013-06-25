@@ -16,44 +16,25 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef VLCINSTANCE
-#define VLCINSTANCE
+#ifndef QTVLC_VLCINSTANCE_P_H
+#define QTVLC_VLCINSTANCE_P_H
 
-#include <QtCore/QObject>
-#include <QtCore/QStringList>
+#include <vlc/vlc.h>
 
-#include <QtVlc/config.h>
+#include <QObject>
 
-struct libvlc_instance_t;
-class VlcInstancePrivate;
+#include "common_p.h"
 
-class QtVlc_EXPORT VlcInstance : public QObject
+class VlcInstancePrivate : public VlcWrapperImpl
 {
     Q_OBJECT
-    VlcInstancePrivate *d;
+    VLC_WRAPPER_IMPL_PRIVATE(VlcInstancePrivate, libvlc_instance_t)
 
 public:
-    VlcInstance(const VlcInstance &);
+    VLC_WRAPPER_IMPL_PUBLIC(VlcInstancePrivate, libvlc_instance_t)
+    explicit VlcInstancePrivate(const QStringList &);
 
-    explicit VlcInstance(const QStringList &args = QStringList());
-
-    VlcInstance(libvlc_instance_t *);
-    libvlc_instance_t *data(); // refcount is NOT increased!
-
-    virtual ~VlcInstance();
-
-    void setUserAgent(const QString &application, const QString &version);
-
-    // version
-    static QString libvlc_version();
-    static QString libvlc_compiler();
-    static QString libvlc_changeset();
-
-    static QString QtVlc_version();
-    static QString QtVlc_version_git();
-    static QString QtVlc_build_libvlc_version();
-    static QString QtVlc_build_libvlccore_version();
-    static QString QtVlc_build_qt_version();
+    void setUserAgent(const QString &, const QString &);
 };
 
-#endif // VLCINSTANCE
+#endif // QTVLC_VLCINSTANCE_P_H

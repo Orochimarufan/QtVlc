@@ -21,36 +21,35 @@
 #include "QtVlc/config.h"
 #include "QtVlc/enum.h"
 #include "QtVlc/VlcInstance.h"
+#include "VlcInstance_p.h"
 
-// constructor
+
+VlcInstance::VlcInstance(const VlcInstance &o) :
+    QObject(), d(o.d)
+{
+    d->retain();
+}
+
 VlcInstance::VlcInstance(const QStringList &args) :
-    QObject(), _instance(nullptr)
+    QObject()
 {
-    char **argv = (char **)malloc(sizeof(char **) * args.count());
-    for (int i = 0; i < args.count(); i++)
-        argv[i] = (char *)qstrdup(args.at(i).toLocal8Bit().data());
-
-    _instance = libvlc_new(args.count(), argv);
-
-    if (_instance)
-        qDebug("Initialized libvlc.");
-    else
-        abort();
-
-    // don't need to libvlc_retain(), libvlc_new() has refcount == 1
+    d = new VlcInstancePrivate(args);
 }
 
-// libvlc primitive
-VlcInstance::VlcInstance(libvlc_instance_t *libvlc_t) :
-    QObject(), _instance(libvlc_t)
+VlcInstance::VlcInstance(libvlc_instance_t *p) :
+    QObject()
 {
-    libvlc_retain(_instance);
+    d = VlcInstancePrivate::instance(p);
 }
 
-// destructor
 VlcInstance::~VlcInstance()
 {
-    libvlc_release(_instance);
+    d->release();
+}
+
+libvlc_instance_t *VlcInstance::data()
+{
+    return d->data();
 }
 
 // version queries
@@ -72,7 +71,7 @@ QString VlcInstance::libvlc_changeset()
 // others
 void VlcInstance::setUserAgent(const QString &appString, const QString &httpString)
 {
-    libvlc_set_user_agent(_instance, appString.toLocal8Bit().data(), httpString.toLocal8Bit().data());
+    d->setUserAgent(appString, httpString);
 }
 
 // build config

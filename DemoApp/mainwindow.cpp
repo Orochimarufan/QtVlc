@@ -31,25 +31,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    inst = VlcInstance::create();
-    player = VlcMediaPlayer::create(inst);
+    inst = new VlcInstance();
+    player = new VlcMediaPlayer(*inst);
     media = nullptr;
 
-    player->connect(ui->btn_play, SIGNAL(clicked()), SLOT(play()));
-    player->connect(ui->btn_pause, SIGNAL(clicked()), SLOT(pause()));
-    player->connect(ui->btn_resume, SIGNAL(clicked()), SLOT(resume()));
-    player->connect(ui->btn_toggle, SIGNAL(clicked()), SLOT(togglePause()));
-    player->connect(ui->btn_stop, SIGNAL(clicked()), SLOT(stop()));
-    player->connect(SIGNAL(positionChanged(float)), this, SLOT(setPosition(float)));
+    connect(ui->btn_play, SIGNAL(clicked()), player, SLOT(play()));
+    connect(ui->btn_pause, SIGNAL(clicked()), player, SLOT(pause()));
+    connect(ui->btn_resume, SIGNAL(clicked()), player, SLOT(resume()));
+    connect(ui->btn_toggle, SIGNAL(clicked()), player, SLOT(togglePause()));
+    connect(ui->btn_stop, SIGNAL(clicked()), player, SLOT(stop()));
+    connect(player, SIGNAL(positionChanged(float)), SLOT(setPosition(float)));
 
     player->setVideoDelegate(ui->video);
 
-    ui->volume->setValue(player->audio()->volume());
+    ui->volume->setValue(player->audio().volume());
 }
 
 MainWindow::~MainWindow()
 {
-    delete media;
+    if (media)
+        delete media;
+    delete player;
     delete inst;
     ui->video->release();
     delete ui;
@@ -60,8 +62,8 @@ void MainWindow::on_actionOpen_triggered()
     QString path = QFileDialog::getOpenFileName(this, "Open Video");
     if (path.isNull()) return;
     if (media) media->deleteLater();
-    media = VlcMedia::new_path(path, inst);
-    player->open(media);
+    media = new VlcMedia(*inst, path, true);
+    player->open(*media);
 }
 
 void MainWindow::on_position_sliderMoved(int new_value)
@@ -80,5 +82,5 @@ void MainWindow::setPosition(const float &pos)
 
 void MainWindow::on_volume_sliderMoved(int i)
 {
-    player->audio()->setVolume(i);
+    player->audio().setVolume(i);
 }

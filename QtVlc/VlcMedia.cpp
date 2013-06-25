@@ -16,211 +16,141 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <vlc/vlc.h>
+#include <QtCore/QUrl>
 
+#include <QtVlc/VlcInstance.h>
 #include <QtVlc/VlcMedia.h>
+#include "VlcMedia_p.h"
 
 
-// create
-VlcMediaPtr VlcMedia::new_location(const QString &location, libvlc_instance_t *instance)
+VlcMedia::VlcMedia(const VlcMedia &o) :
+    QObject(), d(o.d)
 {
-    auto media = libvlc_media_new_location(instance, location.toUtf8().data());
-
-    return new VlcMedia(media);
+    d->retain();
 }
 
-VlcMediaPtr VlcMedia::new_path(const QString &path, libvlc_instance_t *instance)
+VlcMedia::VlcMedia(libvlc_media_t *m) :
+    QObject()
 {
-    auto media = libvlc_media_new_path(instance, path.toUtf8().data());
-
-    return new VlcMedia(media);
+    d = VlcMediaPrivate::instance(m);
 }
 
-VlcMediaPtr VlcMedia::new_fd(const int &fd, libvlc_instance_t *instance)
+VlcMedia::VlcMedia(libvlc_instance_t *instance, QString location, bool local) :
+    QObject()
 {
-    auto media = libvlc_media_new_fd(instance, fd);
-
-    return new VlcMedia(media);
+    d = new VlcMediaPrivate(instance, location, local);
 }
 
-VlcMediaPtr VlcMedia::create(libvlc_media_t *media)
+VlcMedia::VlcMedia(const VlcInstance &instance, QString location, bool local) :
+    QObject()
 {
-    libvlc_media_retain(media);
-
-    return new VlcMedia(media);
+    d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), location, local);
 }
 
-VlcMedia::VlcMedia(libvlc_media_t *media) :
-    QObject(), _media(media)
+VlcMedia::VlcMedia(libvlc_instance_t *instance, QUrl location)
 {
-    //init_events();
+    d = new VlcMediaPrivate(instance, location.toString());
 }
 
-// duplicate
-VlcMediaPtr VlcMedia::duplicate()
+VlcMedia::VlcMedia(const VlcInstance &instance, QUrl location)
 {
-    return new VlcMedia(libvlc_media_duplicate(_media));
+    d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), location.toString());
 }
 
-// destructor
+VlcMedia::VlcMedia(libvlc_instance_t *instance, int fd)
+{
+    d = new VlcMediaPrivate(instance, fd);
+}
+
+VlcMedia::VlcMedia(const VlcInstance &instance, int fd)
+{
+    d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), fd);
+}
+
 VlcMedia::~VlcMedia()
 {
-    //kill_events();
-    libvlc_media_release(_media);
+    d->release();
 }
 
-
-// events
-inline void VlcMedia::init_events()
+libvlc_media_t *VlcMedia::data()
 {
-    _evm = libvlc_media_event_manager(_media);
-
-#define ATTACH(event_type) libvlc_event_attach(_evm, event_type, &VlcMedia::libvlc_event_cb, this)
-    ATTACH(libvlc_MediaMetaChanged);
-    ATTACH(libvlc_MediaSubItemAdded);
-    ATTACH(libvlc_MediaDurationChanged);
-    ATTACH(libvlc_MediaParsedChanged);
-    ATTACH(libvlc_MediaFreed);
-    ATTACH(libvlc_MediaStateChanged);
-#undef ATTACH
+    return d->data();
 }
 
-inline void VlcMedia::kill_events()
+// dupe
+libvlc_media_t *VlcMedia::duplicate_()
 {
-#define DETACH(event_type) libvlc_event_detach(_evm, event_type, &VlcMedia::libvlc_event_cb, this)
-    DETACH(libvlc_MediaMetaChanged);
-    DETACH(libvlc_MediaSubItemAdded);
-    DETACH(libvlc_MediaDurationChanged);
-    DETACH(libvlc_MediaParsedChanged);
-    DETACH(libvlc_MediaFreed);
-    DETACH(libvlc_MediaStateChanged);
-#undef DETACH
+    return d->duplicate();
 }
 
-void VlcMedia::libvlc_event_cb(const libvlc_event_t *e, void *o)
+VlcMedia VlcMedia::duplicate()
 {
-    QObject *object = static_cast<QObject *>(o);
-    VlcMedia *media = qobject_cast<VlcMedia *>(object);
-    if (media)
-        media->libvlc_event(e);
+    return VlcMedia(d->duplicate());
 }
-
-inline void VlcMedia::libvlc_event(const libvlc_event_t *e)
-{
-    emit libvlcEvent(e);
-
-    switch(e->type)
-    {
-    case libvlc_MediaMetaChanged:
-        emit metaChanged(static_cast<VlcMeta::Type>(e->u.media_meta_changed.meta_type));
-        break;
-    case libvlc_MediaSubItemAdded:
-        emit subItemAdded(e->u.media_subitem_added.new_child);
-        break;
-    case libvlc_MediaDurationChanged:
-        emit durationChanged(e->u.media_duration_changed.new_duration);
-        break;
-    case libvlc_MediaParsedChanged:
-        emit parsedChanged(e->u.media_parsed_changed.new_status);
-        break;
-    case libvlc_MediaFreed:
-        emit freed(e->u.media_freed.md);
-        break;
-    case libvlc_MediaStateChanged:
-        emit stateChanged(static_cast<VlcState::Type>(e->u.media_state_changed.new_state));
-        break;
-    default:
-        qDebug("VlcMedia: unknown Event: %i", e->type);
-    }
-}
-
 
 // data
-QString VlcMedia::mrl()
+QString VlcMedia::mrl() const
 {
-    return libvlc_media_get_mrl(_media);
+    return d->mrl();
 }
 
 VlcState::Type VlcMedia::state()
 {
-    return static_cast<VlcState::Type>(libvlc_media_get_state(_media));
+    return d->state();
 }
 
 qint64 VlcMedia::duration()
 {
-    return libvlc_media_get_duration(_media);
+    return d->duration();
 }
 
 
 // user data
 void VlcMedia::setVlcUserData(void *data)
 {
-    libvlc_media_set_user_data(_media, data);
+    d->setVlcUserData(data);
 }
 
 void *VlcMedia::vlcUserData()
 {
-    return libvlc_media_get_user_data(_media);
-}
-
-
-// stats
-libvlc_media_stats_t *VlcMedia::stats(libvlc_media_stats_t *p_stats)
-{
-    libvlc_media_stats_t *out;
-    if (p_stats == nullptr)
-        out = new libvlc_media_stats_t;
-    else
-        out = p_stats;
-
-    if (!libvlc_media_get_stats(_media, out))
-    {
-        if (p_stats == nullptr)
-            delete out;
-        return nullptr;
-    }
-
-    return out;
+    return d->vlcUserData();
 }
 
 
 // meta
 QString VlcMedia::meta(VlcMeta::Type meta)
 {
-    return libvlc_media_get_meta(_media, static_cast<libvlc_meta_t>(meta));
+    return d->meta(meta);
 }
 
 void VlcMedia::setMeta(VlcMeta::Type meta, QString value)
 {
-    libvlc_media_set_meta(_media, static_cast<libvlc_meta_t>(meta), value.toUtf8().data());
+    d->setMeta(meta, value);
 }
 
 bool VlcMedia::saveMeta()
 {
-    return libvlc_media_save_meta(_media);
+    return d->saveMeta();
 }
 
 void VlcMedia::parse(bool async)
 {
-    if (async)
-        libvlc_media_parse_async(_media);
-    else
-        libvlc_media_parse(_media);
+    d->parse(async);
 }
 
 bool VlcMedia::isParsed()
 {
-    return libvlc_media_is_parsed(_media);
+    return d->isParsed();
 }
 
 
 // Options
 void VlcMedia::addOption(const QString &options)
 {
-    libvlc_media_add_option(_media, options.toUtf8().data());
+    d->addOption(options);
 }
 
 void VlcMedia::addOptionFlag(const QString &options, unsigned flags)
 {
-    libvlc_media_add_option_flag(_media, options.toUtf8().data(), flags);
+    d->addOptionFlag(options, flags);
 }
