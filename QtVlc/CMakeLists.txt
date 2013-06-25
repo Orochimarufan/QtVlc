@@ -39,7 +39,8 @@ SET(QtVlc_HEADERS
 add_definitions(-DQtVlc_LIBRARY)
 add_library(QtVlc SHARED ${QtVlc_SOURCES} ${QtVlc_HEADERS})
 QT5_USE_MODULES(QtVlc Core)
-target_link_libraries(QtVlc ${LIBVLC_LIBRARIES} ${LIBVLCCORE_LIBRARIES})
+#target_link_libraries(QtVlc ${LIBVLC_LIBRARIES} ${LIBVLCCORE_LIBRARIES})
+target_link_libraries(QtVlc ${LIBVLC_LIBRARIES})
 
 GET_PROPERTY(QtVlc_LIBRARY TARGET QtVlc PROPERTY LOCATION)
 SET(QtVlc_LIBRARY ${QtVlc_LIBRARY} CACHE INTERNAL "")

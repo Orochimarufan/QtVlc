@@ -79,7 +79,7 @@ void VlcMediaPlayer::setMedia(libvlc_media_t *media)
 WId VlcMediaPlayer::videoWidget()
 {
 #if defined(Q_OS_WIN32)
-    return libvlc_media_player_get_hwnd(_player);
+    return (WId) libvlc_media_player_get_hwnd(_player);
 #elif defined(Q_OS_MAC)
     return libvlc_media_player_get_nsobject(_player);
 #elif defined(Q_OS_UNIX)
@@ -99,7 +99,7 @@ void VlcMediaPlayer::setVideoWidget(WId widget)
 inline void VlcMediaPlayer::_setVideoWidget(WId widget)
 {
 #if defined(Q_OS_WIN32)
-    libvlc_media_player_set_hwnd(_player, widget);
+    libvlc_media_player_set_hwnd(_player, (void *) widget);
 #elif defined(Q_OS_MAC)
     libvlc_media_player_set_nsobject(_player, widget);
 #elif defined(Q_OS_UNIX)

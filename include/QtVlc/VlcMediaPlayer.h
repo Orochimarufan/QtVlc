@@ -83,7 +83,7 @@ public:
      * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
      */
     static VlcMediaPlayerPtr create(libvlc_media_player_t *player);
-    libvlc_media_player_t *data();
+    inline libvlc_media_player_t *data();
 
     // destructor
     virtual ~VlcMediaPlayer();
@@ -99,15 +99,15 @@ public:
      * @brief Set the current media
      * @param media the media object
      */
-    void setMedia(VlcMediaPtr media);
+    inline void setMedia(VlcMediaPtr media);
     void setMedia(libvlc_media_t *media);
 
     /**
      * @brief Set the current media and start playing
      * @param media the media object
      */
-    void open(VlcMediaPtr media);
-    void open(libvlc_media_t *media);
+    inline void open(VlcMediaPtr media);
+    inline void open(libvlc_media_t *media);
 
     // position
     /**
@@ -158,19 +158,19 @@ public:
      * @brief Set the Video Widget Delegate
      * @param delegate object implementing IVlcVideoDelegate
      */
-    void setVideoDelegate(IVlcVideoDelegate *delegate);
+    inline void setVideoDelegate(IVlcVideoDelegate *delegate);
 
     /**
      * @brief Get the Video Widget Delegate
      * @return the IVlcVideoDelegate or nullptr
      */
-    IVlcVideoDelegate *videoDelegate();
+    inline IVlcVideoDelegate *videoDelegate();
 
-    VlcMediaPlayerAudio *audio();
-    VlcMediaPlayerVideo *video();
+    inline VlcMediaPlayerAudio *audio();
+    inline VlcMediaPlayerVideo *video();
 
-    void connect(const char *signal, const QObject *receiver, const char *slot);
-    void connect(const QObject *sender, const char *signal, const char *slot);
+    inline void connect(const char *signal, const QObject *receiver, const char *slot);
+    inline void connect(const QObject *sender, const char *signal, const char *slot);
 
 public slots:
     // player

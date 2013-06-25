@@ -19,10 +19,8 @@
 #ifndef ENUM_H
 #define ENUM_H
 
-#include <QtVlc/config.h>
-
 namespace VlcMeta {
-    enum QtVlc_EXPORT Type {
+    enum Type {
         Title,
         Artist,
         Genre,
@@ -44,7 +42,7 @@ namespace VlcMeta {
 }
 
 namespace VlcPlaybackMode {
-    enum QtVlc_EXPORT Type {
+    enum Type {
         DefaultPlayback,
         Loop,
         Repeat
@@ -52,7 +50,7 @@ namespace VlcPlaybackMode {
 }
 
 namespace VlcState {
-    enum QtVlc_EXPORT Type {
+    enum Type {
         NothingSpecial,
         Opening,
         Buffering,

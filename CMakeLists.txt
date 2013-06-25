@@ -17,15 +17,42 @@
 # *****************************************************************************/
 
 project(QtVlc)
-cmake_minimum_required(VERSION 2.8.10)
+IF(WIN32)
+    cmake_minimum_required(VERSION 2.8.11)
+ELSE()
+    cmake_minimum_required(VERSION 2.8.10)
+ENDIF()
+
+###### version ######
+SET(QTVLC_VERSION 0.1.0)
+
+FIND_PROGRAM(GIT git)
+IF(GIT)
+        EXECUTE_PROCESS(
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                COMMAND ${GIT} rev-parse --short HEAD
+                OUTPUT_VARIABLE QTVLC_VERSION_GIT OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        IF(QTVLC_VERSION_GIT STREQUAL "")
+                SET(QTVLC_VERSION_GIT exported)
+        ENDIF()
+ELSE(GIT)
+        SET(QTVLC_VERSION_GIT exported)
+ENDIF(GIT)
+
+MESSAGE(STATUS "Building QtVlc ${QTVLC_VERSION} (${QTVLC_VERSION_GIT})")
+
+######## Set CMake options ########
+SET(CMAKE_AUTOMOC ON)
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Output all executables and shared libs in the main build folder, not in subfolders.
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
-######## Set CMake options ########
-SET(CMAKE_AUTOMOC ON)
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+IF(WIN32)
+    SET(ENV{PATH} "${PROJECT_SOURCE_DIR}\\bin;$ENV{PATH}")
+ENDIF()
 
 ######## Set compiler flags ########
 IF(APPLE)
@@ -38,43 +65,54 @@ ELSEIF(MINGW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 ENDIF()
 
+###### libvlc ######
+# TODO: build vlc from source
+IF(WIN32)
+    SET(VLC_PF_PATH "VideoLAN\\VLC")
+    IF(ENV{VLC_PATH})
+        MESSAGE(STATUS "(WIN32) Searching for VLC in \"$ENV{VLC_PATH}\"")
+        SET(VLC_PATH "$ENV{VLC_PATH}")
+    ELSE()
+        # try to guess vlc path
+        MESSAGE(STATUS "(WIN32) Searching for VLC in \"%PF%\\${VLC_PF_PATH}\"")
+        SET(VLC_PATH "$ENV{PROGRAMFILES}\\${VLC_PF_PATH}")
+    ENDIF()
+    SET(VLC_SDK "${VLC_PATH}\\sdk")
+    SET(ENV{PKG_CONFIG_PATH} "${VLC_SDK}\\lib\\pkgconfig};$ENV{PKG_CONFIG_PATH}")
+ENDIF()
+
+include(FindPkgConfig)
+pkg_check_modules(LIBVLC REQUIRED libvlc QUIET)
+pkg_search_module(LIBVLCCORE REQUIRED libvlccore vlc-plugin QUIET)
+
+IF(WIN32)
+    # fix paths
+    SET(LIBVLC_INCLUDE_DIRS "${VLC_SDK}\\include")
+    SET(LIBVLC_LIBRARY_DIRS "${VLC_SDK}\\lib")
+    MESSAGE(STATUS "(WIN32) Copying VLC DLLs")
+    FILE(COPY "${VLC_PATH}\\libvlc.dll" "${VLC_PATH}\\libvlccore.dll" "${VLC_PATH}\\plugins"
+         DESTINATION "${PROJECT_BINARY_DIR}")
+    FILE(REMOVE "${PROJECT_BINARY_DIR}\\plugins\\gui\\libqt4_plugin.dll")
+ENDIF()
+
+include_directories(${LIBVLC_INCLUDE_DIRS})
+link_directories(${LIBVLC_LIBRARY_DIRS})
+
+MESSAGE(STATUS "found libvlc, version ${LIBVLC_VERSION}")
+
 ###### Qt ######
 find_package(Qt5Core REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 find_package(Qt5Widgets REQUIRED)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
-###### libvlc ######
-include(FindPkgConfig)
-pkg_check_modules(LIBVLC REQUIRED libvlc)
-include_directories(LIBVLC_INCLUDE_DIRS)
-pkg_search_module(LIBVLCCORE REQUIRED libvlccore vlc-plugin)
-include_directories(LIBVLCCORE_INCLUDE_DIRS)
+MESSAGE(STATUS "found Qt5, version ${Qt5Core_VERSION_STRING}")
 
-# version
-SET(QTVLC_VERSION 0.1.0)
-
-FIND_PROGRAM(GIT git)
-IF(GIT)
-	EXECUTE_PROCESS(
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMAND ${GIT} rev-parse --short HEAD
-		OUTPUT_VARIABLE QTVLC_VERSION_GIT OUTPUT_STRIP_TRAILING_WHITESPACE
-	)
-	IF(QTVLC_VERSION_GIT STREQUAL "")
-		SET(QTVLC_VERSION_GIT exported)
-	ENDIF()
-ELSE(GIT)
-	SET(QTVLC_VERSION_GIT exported)
-ENDIF(GIT)
-
-MESSAGE("Building QtVlc ${QTVLC_VERSION} (${QTVLC_VERSION_GIT})")
-
-# compile config
+###### config ######
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/build_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/inc/build_config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/inc)
 
-# build all
+###### build ######
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(QtVlc)

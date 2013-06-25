@@ -53,7 +53,7 @@ VlcMediaPtr VlcMedia::create(libvlc_media_t *media)
 VlcMedia::VlcMedia(libvlc_media_t *media) :
     QObject(), _media(media)
 {
-    init_events();
+    //init_events();
 }
 
 // duplicate
@@ -65,7 +65,7 @@ VlcMediaPtr VlcMedia::duplicate()
 // destructor
 VlcMedia::~VlcMedia()
 {
-    kill_events();
+    //kill_events();
     libvlc_media_release(_media);
 }
 
