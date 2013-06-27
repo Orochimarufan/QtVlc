@@ -23,7 +23,7 @@
 #include <QtVlc/error.h>
 #include "VlcMedia_p.h"
 
-
+// signals
 void VlcMedia::d_connect()
 {
 #define SIG(S) connect(d, SIGNAL(S), this, SIGNAL(S))
@@ -37,15 +37,13 @@ void VlcMedia::d_connect()
 #undef SIG
 }
 
-VlcMedia::VlcMedia() :
-    QObject(), d(nullptr)
-{}
-
+// validity
 bool VlcMedia::isValid()
 {
     return d != nullptr;
 }
 
+// assign
 VlcMedia &VlcMedia::operator =(const VlcMedia &other)
 {
     if (d != nullptr)
@@ -84,6 +82,12 @@ VlcMedia &VlcMedia::operator =(libvlc_media_t *other)
     return *this;
 }
 
+// NULL constructor
+VlcMedia::VlcMedia() :
+    QObject(), d(nullptr)
+{}
+
+// copy constructor
 VlcMedia::VlcMedia(const VlcMedia &o) :
     QObject(), d(o.d)
 {
@@ -103,6 +107,7 @@ VlcMedia::VlcMedia(libvlc_media_t *m) :
         d_connect();
 }
 
+// location constructors
 VlcMedia::VlcMedia(libvlc_instance_t *instance, QString location, bool local) :
     QObject()
 {
@@ -119,41 +124,71 @@ VlcMedia::VlcMedia(const VlcInstance &instance, QString location, bool local) :
     d_connect();
 }
 
-VlcMedia::VlcMedia(libvlc_instance_t *instance, QUrl location)
+VlcMedia::VlcMedia(QString location, bool local) :
+    QObject()
+{
+    d = new VlcMediaPrivate(VlcInstance::globalInstance(), location, local);
+
+    d_connect();
+}
+
+VlcMedia::VlcMedia(libvlc_instance_t *instance, QUrl location) :
+    QObject()
 {
     d = new VlcMediaPrivate(instance, location.toString());
 
     d_connect();
 }
 
-VlcMedia::VlcMedia(const VlcInstance &instance, QUrl location)
+VlcMedia::VlcMedia(const VlcInstance &instance, QUrl location) :
+    QObject()
 {
     d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), location.toString());
 
     d_connect();
 }
 
-VlcMedia::VlcMedia(libvlc_instance_t *instance, int fd)
+VlcMedia::VlcMedia(QUrl location) :
+    QObject()
+{
+    d = new VlcMediaPrivate(VlcInstance::globalInstance(), location.toString(), false);
+
+    d_connect();
+}
+
+// fd constructors
+VlcMedia::VlcMedia(libvlc_instance_t *instance, int fd) :
+    QObject()
 {
     d = new VlcMediaPrivate(instance, fd);
 
     d_connect();
 }
 
-VlcMedia::VlcMedia(const VlcInstance &instance, int fd)
+VlcMedia::VlcMedia(const VlcInstance &instance, int fd) :
+    QObject()
 {
     d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), fd);
 
-    if (d != nullptr)
-        d_connect();
+    d_connect();
 }
 
+VlcMedia::VlcMedia(int fd) :
+    QObject()
+{
+    d = new VlcMediaPrivate(VlcInstance::globalInstance(), fd);
+
+    d_connect();
+}
+
+// destructor
 VlcMedia::~VlcMedia()
 {
     if (d != nullptr)
         d->release();
 }
 
+// data
 libvlc_media_t *VlcMedia::data()
 {
     CHECKNP

@@ -68,6 +68,14 @@ VlcInstance &VlcInstance::operator =(libvlc_instance_t *p)
     d = VlcInstancePrivate::instance(p);
 }
 
+VlcInstance::VlcInstance() :
+    QObject()
+{
+    d = VlcInstancePrivate::globalInstance();
+
+    d->retain();
+}
+
 VlcInstance::~VlcInstance()
 {
     if (d != nullptr);
@@ -78,6 +86,11 @@ libvlc_instance_t *VlcInstance::data()
 {
     CHECKNP
     return d->data();
+}
+
+libvlc_instance_t *VlcInstance::globalInstance()
+{
+    return VlcInstancePrivate::globalInstance()->data();
 }
 
 // version queries

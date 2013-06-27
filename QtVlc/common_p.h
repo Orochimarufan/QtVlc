@@ -87,7 +87,7 @@ public:
         VLC_WRAPPER_IMPL_INIT() \
     } \
     T :: ~ T () { \
-        qDebug("delete " #T); \
+/*        qDebug("delete " #T); */\
         VLC_WRAPPER_IMPL_EXIT() \
         LIBVLC_PREFIX ## _release(d); \
     }
@@ -117,7 +117,7 @@ public:
 
 // cannot call members on const references
 template <class T>
-T *getref(const T &in)
+inline T *getref(const T &in)
 {
     return (T *)&in;
 }

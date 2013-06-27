@@ -30,11 +30,16 @@ class VlcInstancePrivate : public VlcWrapperImpl
     Q_OBJECT
     VLC_WRAPPER_IMPL_PRIVATE(VlcInstancePrivate, libvlc_instance_t)
 
+    static VlcInstancePrivate *global;
+    static void deleteGlobalInstance() noexcept;
+
 public:
     VLC_WRAPPER_IMPL_PUBLIC(VlcInstancePrivate, libvlc_instance_t)
     explicit VlcInstancePrivate(const QStringList &);
 
     void setUserAgent(const QString &, const QString &);
+
+    static VlcInstancePrivate *globalInstance();
 };
 
 #endif // QTVLC_VLCINSTANCE_P_H

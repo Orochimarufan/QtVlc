@@ -34,11 +34,13 @@ struct libvlc_instance_t;
 class VlcInstance;
 class VlcMedia;
 class VlcMediaPlayerPrivate;
+class VlcMediaPlayerAudio;
 class IVlcVideoDelegate;
 
 
 /**
  * @brief The VlcMediaPlayer class
+ * The media playback controller
  */
 class QtVlc_EXPORT VlcMediaPlayer : public QObject
 {
@@ -47,45 +49,39 @@ class QtVlc_EXPORT VlcMediaPlayer : public QObject
     void d_connect();
 
 public:
-    VlcMediaPlayer();
     /**
      * @brief Check if this VlcMediaPlayer is valid
-     * True if not constructed with VlcMediaPlayer().
+     * True if this VlcMediaPlayer has underlying data.
      * Most methods will throw a NullPointer exception if called invalid objects.
-     * @return
      */
     bool isValid();
 
-
+    // copy, assign & libvlc primitive
     VlcMediaPlayer(const VlcMediaPlayer &);
     VlcMediaPlayer &operator =(const VlcMediaPlayer &);
+    VlcMediaPlayer(libvlc_media_player_t *player);
+    VlcMediaPlayer &operator =(libvlc_media_player_t *);
+    libvlc_media_player_t *data();
 
     /**
      * @brief VlcMediaPlayer constructor
      * Create a new VlcMediaPlayer instance
-     * @param instance the instance object [libvlc_instance_t *]
-     * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
-     */
-    explicit VlcMediaPlayer(libvlc_instance_t *instance);
-
-    /**
-     * @brief VlcMediaPlayer constructor
-     * Create a new VlcMediaPlayer instance
-     * @param instancethe instance object [VlcInstance *]
-     * @returna QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
+     * @param instance The VlcInstance
      */
     explicit VlcMediaPlayer(const VlcInstance &instance);
 
     /**
      * @brief VlcMediaPlayer constructor
-     * Create a VlcMediaPlayer instance from an existing libvlc_media_player_t pointer.
-     * If there already is an instance pointing to that libvlc_media_player_t, it gets recalled.
-     * @param player the player object [libvlc_media_player_t *]
-     * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
+     * Create a new VlcMediaPlayer instance
+     * @param instance The libvlc_instance_t
      */
-    VlcMediaPlayer(libvlc_media_player_t *player);
-    VlcMediaPlayer &operator =(libvlc_media_player_t *);
-    libvlc_media_player_t *data();
+    explicit VlcMediaPlayer(libvlc_instance_t *instance);
+
+    /**
+     * @brief VlcMediaPlayer constructor
+     * Create a new VlcMediaPlayer instance on the global VlcInstance
+     */
+    VlcMediaPlayer();
 
     // destructor
     virtual ~VlcMediaPlayer();
@@ -168,6 +164,8 @@ public:
      * @return the IVlcVideoDelegate or nullptr
      */
     IVlcVideoDelegate *videoDelegate();
+
+    VlcMediaPlayerAudio audio();
 
 public Q_SLOTS:
     // player

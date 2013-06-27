@@ -24,17 +24,19 @@
 
 #include "VlcMediaPlayer_p.h"
 
-
-VlcMediaPlayerAudio::VlcMediaPlayerAudio() :
-    QObject(), d(nullptr)
-{
-}
-
+// validity
 bool VlcMediaPlayerAudio::isValid()
 {
     return d != nullptr;
 }
 
+// NULL constructor
+VlcMediaPlayerAudio::VlcMediaPlayerAudio() :
+    QObject(), d(nullptr)
+{
+}
+
+// constructor/assign
 VlcMediaPlayerAudio::VlcMediaPlayerAudio(const VlcMediaPlayerAudio &o) :
     QObject(), d(o.d)
 {
@@ -90,15 +92,18 @@ VlcMediaPlayerAudio &VlcMediaPlayerAudio::operator =(libvlc_media_player_t *play
 VlcMediaPlayerAudio::VlcMediaPlayerAudio(VlcMediaPlayerPrivate *p) :
     QObject(), d(p)
 {
-    d->retain();
+    if (d != nullptr)
+        d->retain();
 }
 
+// destructor
 VlcMediaPlayerAudio::~VlcMediaPlayerAudio()
 {
     if (d != nullptr)
         d->release();
 }
 
+// volume
 int VlcMediaPlayerAudio::volume() const
 {
     CHECKNP
@@ -111,6 +116,7 @@ bool VlcMediaPlayerAudio::isMuted() const
     return d->audio_isMuted();
 }
 
+// tracks
 void VlcMediaPlayerAudio::setTrack(const int &track)
 {
     CHECKNP
@@ -135,6 +141,7 @@ QHash<int, QString> VlcMediaPlayerAudio::trackDescription() const
     return d->audio_trackDescription();
 }
 
+// slots
 void VlcMediaPlayerAudio::setVolume(const int &volume)
 {
     CHECKNP

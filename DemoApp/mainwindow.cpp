@@ -29,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    player = VlcMediaPlayer(inst);
-    audio = VlcMediaPlayerAudio(player);
+    audio = player.audio();
 
     connect(ui->btn_play, SIGNAL(clicked()), &player, SLOT(play()));
     connect(ui->btn_pause, SIGNAL(clicked()), &player, SLOT(pause()));
@@ -54,7 +53,7 @@ void MainWindow::on_actionOpen_triggered()
 {
     QString path = QFileDialog::getOpenFileName(this, "Open Video");
     if (path.isNull()) return;
-    media = VlcMedia(inst, path, true);
+    media = VlcMedia(path, true);
     player.open(media);
 }
 

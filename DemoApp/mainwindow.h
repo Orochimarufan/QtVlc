@@ -41,7 +41,6 @@ public:
     
 private:
     Ui::MainWindow *ui;
-    VlcInstance inst;
     VlcMediaPlayer player;
     VlcMediaPlayerAudio audio;
     VlcMedia media;

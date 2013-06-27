@@ -28,13 +28,21 @@ struct libvlc_media_player_t;
 class VlcMediaPlayer;
 class VlcMediaPlayerPrivate;
 
+/**
+ * @brief The VlcMediaPlayerAudio class
+ * A VlcMediaPlayer's Audio controls.
+ */
 class QtVlc_EXPORT VlcMediaPlayerAudio : public QObject
 {
     Q_OBJECT
     VlcMediaPlayerPrivate *d;
 
 public:
+    /**
+     * @brief create a NULL VlcMediaPlayerAudio
+     */
     VlcMediaPlayerAudio();
+
     /**
      * @brief Check if this VlcMediaPlayerAudio is valid
      * True if not constructed with VlcMediaPlayerAudio().

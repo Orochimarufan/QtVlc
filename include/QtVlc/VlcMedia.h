@@ -31,6 +31,10 @@ struct libvlc_event_t;
 class VlcInstance;
 class VlcMediaPrivate;
 
+/**
+ * @brief The VlcMedia class
+ * An abstract presentation of a playable media
+ */
 class QtVlc_EXPORT VlcMedia : public QObject
 {
     Q_OBJECT
@@ -38,33 +42,98 @@ class QtVlc_EXPORT VlcMedia : public QObject
     void d_connect();
 
 public:
-    VlcMedia();
     /**
-     * @brief Check if this VlcMedia is valid
-     * True if not constructed with VlcMedia().
+     * @brief Check if this VlcMedia is valid.
+     * True if this VlcMedia has underlying data.
      * Most methods will throw a NullPointer exception if called invalid objects.
-     * @return
      */
     bool isValid();
 
+    // copy, assign & libvlc primitive
     VlcMedia &operator =(const VlcMedia &);
     VlcMedia(const VlcMedia &);
     VlcMedia &operator =(libvlc_media_t *);
     VlcMedia(libvlc_media_t *);
+    libvlc_media_t *data();
 
-    explicit VlcMedia(libvlc_instance_t *instance, QString location, bool local = false);
+    // NULL constructor
+    /**
+     * @brief VlcMedia constructor
+     * Create a NULL VlcMedia
+     */
+    VlcMedia();
+
+    // location constructors
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The VlcInstance
+     * @param location The media location
+     * @param local Wether location is a local path
+     */
     explicit VlcMedia(const VlcInstance &instance, QString location, bool local = false);
-    explicit VlcMedia(libvlc_instance_t *instance, QUrl location);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The libvlc_instance_t
+     * @param location The media location
+     * @param local Wether location is a local path
+     */
+    explicit VlcMedia(libvlc_instance_t *instance, QString location, bool local = false);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param location The media location
+     * @param local Wether location is a local path
+     * Uses the global VlcInstance
+     */
+    explicit VlcMedia(QString location, bool local = false);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The VlcInstance
+     * @param location The media location
+     */
     explicit VlcMedia(const VlcInstance &instance, QUrl location);
 
-    explicit VlcMedia(libvlc_instance_t *instance, int fd);
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The libvlc_instance_t
+     * @param location The media location
+     */
+    explicit VlcMedia(libvlc_instance_t *instance, QUrl location);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param location The media location
+     * Uses the global VlcInstance
+     */
+    explicit VlcMedia(QUrl location);
+
+    // fd constructors
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The VlcInstance
+     * @param fd The open file descriptor
+     */
     explicit VlcMedia(const VlcInstance &instance, int fd);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param instance The libvlc_instance_t
+     * @param fd The open file descriptor
+     */
+    explicit VlcMedia(libvlc_instance_t *instance, int fd);
+
+    /**
+     * @brief VlcMedia constructor
+     * @param fd The open file descriptor
+     * Uses the global VlcInstance
+     */
+    explicit VlcMedia(int fd);
 
     // duplicate
     VlcMedia duplicate();
     libvlc_media_t *duplicate_();
-
-    libvlc_media_t *data();
 
     // destructor
     virtual ~VlcMedia();

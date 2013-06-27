@@ -17,12 +17,14 @@
  *****************************************************************************/
 
 #include <QtVlc/VlcMediaPlayer.h>
+#include <QtVlc/VlcMediaPlayerAudio.h>
 #include <QtVlc/VlcInstance.h>
 #include <QtVlc/VlcMedia.h>
 #include <QtVlc/error.h>
 
 #include "VlcMediaPlayer_p.h"
 
+// signals
 void VlcMediaPlayer::d_connect()
 {
 #define SIG(signal) connect(d, signal, signal)
@@ -45,16 +47,13 @@ void VlcMediaPlayer::d_connect()
 #undef SIG
 }
 
-VlcMediaPlayer::VlcMediaPlayer() :
-    QObject(), d(nullptr)
-{
-}
-
+// validity
 bool VlcMediaPlayer::isValid()
 {
     return d != nullptr;
 }
 
+// constructor / assignment
 VlcMediaPlayer::VlcMediaPlayer(const VlcMediaPlayer &o) :
     QObject(), d(o.d)
 {
@@ -98,6 +97,14 @@ VlcMediaPlayer::VlcMediaPlayer(libvlc_instance_t *instance) :
     d_connect();
 }
 
+VlcMediaPlayer::VlcMediaPlayer() :
+    QObject()
+{
+    d = new VlcMediaPlayerPrivate(VlcInstance::globalInstance());
+
+    d_connect();
+}
+
 VlcMediaPlayer::VlcMediaPlayer(libvlc_media_player_t *player) :
     QObject()
 {
@@ -123,22 +130,31 @@ VlcMediaPlayer &VlcMediaPlayer::operator =(libvlc_media_player_t *player)
     return *this;
 }
 
+// destructor
 VlcMediaPlayer::~VlcMediaPlayer()
 {
     if (d != nullptr)
         d->release();
 }
 
+// data
 libvlc_media_player_t *VlcMediaPlayer::data()
 {
     CHECKNP
     return d->data();
 }
 
+// media
 void VlcMediaPlayer::setMedia(libvlc_media_t *media)
 {
     CHECKNP
     d->setMedia(media);
+}
+
+void VlcMediaPlayer::setMedia(const VlcMedia &media)
+{
+    CHECKNP
+    d->setMedia(getref<VlcMedia>(media)->data());
 }
 
 VlcMedia VlcMediaPlayer::media()
@@ -153,6 +169,7 @@ libvlc_media_t *VlcMediaPlayer::media_()
     return d->media();
 }
 
+// open
 void VlcMediaPlayer::open(libvlc_media_t *media)
 {
     CHECKNP
@@ -167,6 +184,7 @@ void VlcMediaPlayer::open(const VlcMedia &media)
     d->play();
 }
 
+// position
 qint64 VlcMediaPlayer::length() const
 {
     CHECKNP
@@ -197,16 +215,11 @@ void VlcMediaPlayer::setPosition(const float &position)
     d->setPosition(position);
 }
 
+// video widget
 void VlcMediaPlayer::setVideoWidget(WId widget)
 {
     CHECKNP
     d->setVideoWidget(widget);
-}
-
-void VlcMediaPlayer::setVideoDelegate(IVlcVideoDelegate *delegate)
-{
-    CHECKNP
-    d->setVideoDelegate(delegate);
 }
 
 WId VlcMediaPlayer::videoWidget()
@@ -215,12 +228,20 @@ WId VlcMediaPlayer::videoWidget()
     return d->videoWidget();
 }
 
+// video delegate
+void VlcMediaPlayer::setVideoDelegate(IVlcVideoDelegate *delegate)
+{
+    CHECKNP
+    d->setVideoDelegate(delegate);
+}
+
 IVlcVideoDelegate *VlcMediaPlayer::videoDelegate()
 {
     CHECKNP
     return d->videoDelegate();
 }
 
+// slots
 void VlcMediaPlayer::play()
 {
     CHECKNP
@@ -249,4 +270,10 @@ void VlcMediaPlayer::stop()
 {
     CHECKNP
     d->stop();
+}
+
+// audio
+VlcMediaPlayerAudio VlcMediaPlayer::audio()
+{
+    return VlcMediaPlayerAudio(d);
 }

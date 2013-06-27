@@ -27,6 +27,10 @@
 struct libvlc_instance_t;
 class VlcInstancePrivate;
 
+/**
+ * @brief The VlcInstance class
+ * The Entity controlling EVERYTHING ;)
+ */
 class QtVlc_EXPORT VlcInstance : public QObject
 {
     Q_OBJECT
@@ -35,24 +39,44 @@ class QtVlc_EXPORT VlcInstance : public QObject
 public:
     /**
      * @brief Check if this VlcInstance is valid
-     * True if not constructed with VlcInstance(nullptr).
+     * True if this VlcInstance has underlying data.
      * Most methods will throw a NullPointer exception if called invalid objects.
-     * @return
      */
     bool isValid();
 
+    // copy, assignment & libvlc primitive
     VlcInstance(const VlcInstance &);
     VlcInstance &operator =(const VlcInstance &);
-
-    explicit VlcInstance(const QStringList &args = QStringList());
-
     VlcInstance(libvlc_instance_t *);
     VlcInstance &operator =(libvlc_instance_t *);
     libvlc_instance_t *data(); // refcount is NOT increased!
 
+    /**
+     * @brief VlcInstance constructor
+     * The global VlcInstance
+     */
+    VlcInstance();
+
+    /**
+     * @brief The raw global instance
+     */
+    static libvlc_instance_t *globalInstance();
+
+    /**
+     * @brief VlcInstance constructor
+     * @param args the libvlc commandline arguments
+     */
+    explicit VlcInstance(const QStringList &args);
+
+    // destructor
     virtual ~VlcInstance();
 
-    void setUserAgent(const QString &application, const QString &version);
+    /**
+     * @brief Set the application name.
+     * @param application Human-readable application name
+     * @param version HTTP user agent
+     */
+    void setUserAgent(const QString &application, const QString &http);
 
     // version
     static QString libvlc_version();
