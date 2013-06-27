@@ -34,9 +34,21 @@ class QtVlc_EXPORT VlcMediaPlayerAudio : public QObject
     VlcMediaPlayerPrivate *d;
 
 public:
+    VlcMediaPlayerAudio();
+    /**
+     * @brief Check if this VlcMediaPlayerAudio is valid
+     * True if not constructed with VlcMediaPlayerAudio().
+     * Most methods will throw a NullPointer exception if called invalid objects.
+     * @return
+     */
+    bool isValid();
+
     VlcMediaPlayerAudio(const VlcMediaPlayerAudio &);
-    VlcMediaPlayerAudio(libvlc_media_player_t *player);
+    VlcMediaPlayerAudio &operator =(const VlcMediaPlayerAudio &);
+    VlcMediaPlayerAudio(libvlc_media_player_t *);
+    VlcMediaPlayerAudio &operator =(libvlc_media_player_t *);
     VlcMediaPlayerAudio(const VlcMediaPlayer &);
+    VlcMediaPlayerAudio &operator =(const VlcMediaPlayer &);
     VlcMediaPlayerAudio(VlcMediaPlayerPrivate *);
 
     virtual ~VlcMediaPlayerAudio();

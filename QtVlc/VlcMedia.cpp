@@ -20,87 +20,179 @@
 
 #include <QtVlc/VlcInstance.h>
 #include <QtVlc/VlcMedia.h>
+#include <QtVlc/error.h>
 #include "VlcMedia_p.h"
 
+
+void VlcMedia::d_connect()
+{
+#define SIG(S) connect(d, SIGNAL(S), this, SIGNAL(S))
+    SIG(libvlcEvent(const libvlc_event_t *));
+    SIG(metaChanged(const VlcMeta::Type &));
+    SIG(subItemAdded(libvlc_media_t *));
+    SIG(durationChanged(const qint64 &));
+    SIG(parsedChanged(const int &));
+    SIG(freed(libvlc_media_t *));
+    SIG(stateChanged(const VlcState::Type &));
+#undef SIG
+}
+
+VlcMedia::VlcMedia() :
+    QObject(), d(nullptr)
+{}
+
+bool VlcMedia::isValid()
+{
+    return d != nullptr;
+}
+
+VlcMedia &VlcMedia::operator =(const VlcMedia &other)
+{
+    if (d != nullptr)
+    {
+        disconnect(d);
+        d->release();
+    }
+
+    d = other.d;
+
+    if (d != nullptr)
+    {
+        d->retain();
+        d_connect();
+    }
+
+    return *this;
+}
+
+VlcMedia &VlcMedia::operator =(libvlc_media_t *other)
+{
+    if (d != nullptr)
+    {
+        disconnect(d);
+        d->release();
+    }
+
+    d = VlcMediaPrivate::instance(other);
+
+    if (d != nullptr)
+    {
+        d->retain();
+        d_connect();
+    }
+
+    return *this;
+}
 
 VlcMedia::VlcMedia(const VlcMedia &o) :
     QObject(), d(o.d)
 {
-    d->retain();
+    if (d != nullptr)
+    {
+        d->retain();
+        d_connect();
+    }
 }
 
 VlcMedia::VlcMedia(libvlc_media_t *m) :
     QObject()
 {
     d = VlcMediaPrivate::instance(m);
+
+    if (d != nullptr)
+        d_connect();
 }
 
 VlcMedia::VlcMedia(libvlc_instance_t *instance, QString location, bool local) :
     QObject()
 {
     d = new VlcMediaPrivate(instance, location, local);
+
+    d_connect();
 }
 
 VlcMedia::VlcMedia(const VlcInstance &instance, QString location, bool local) :
     QObject()
 {
     d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), location, local);
+
+    d_connect();
 }
 
 VlcMedia::VlcMedia(libvlc_instance_t *instance, QUrl location)
 {
     d = new VlcMediaPrivate(instance, location.toString());
+
+    d_connect();
 }
 
 VlcMedia::VlcMedia(const VlcInstance &instance, QUrl location)
 {
     d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), location.toString());
+
+    d_connect();
 }
 
 VlcMedia::VlcMedia(libvlc_instance_t *instance, int fd)
 {
     d = new VlcMediaPrivate(instance, fd);
+
+    d_connect();
 }
 
 VlcMedia::VlcMedia(const VlcInstance &instance, int fd)
 {
     d = new VlcMediaPrivate(getref<VlcInstance>(instance)->data(), fd);
+
+    if (d != nullptr)
+        d_connect();
 }
 
 VlcMedia::~VlcMedia()
 {
-    d->release();
+    if (d != nullptr)
+        d->release();
 }
 
 libvlc_media_t *VlcMedia::data()
 {
+    CHECKNP
     return d->data();
 }
 
 // dupe
 libvlc_media_t *VlcMedia::duplicate_()
 {
-    return d->duplicate();
+    if (d != nullptr)
+        return d->duplicate();
+    else
+        return nullptr;
 }
 
 VlcMedia VlcMedia::duplicate()
 {
-    return VlcMedia(d->duplicate());
+    if (d != nullptr)
+        return VlcMedia(d->duplicate());
+    else
+        return *this;
 }
 
 // data
 QString VlcMedia::mrl() const
 {
+    CHECKNP
     return d->mrl();
 }
 
 VlcState::Type VlcMedia::state()
 {
+    CHECKNP
     return d->state();
 }
 
 qint64 VlcMedia::duration()
 {
+    CHECKNP
     return d->duration();
 }
 
@@ -108,11 +200,13 @@ qint64 VlcMedia::duration()
 // user data
 void VlcMedia::setVlcUserData(void *data)
 {
+    CHECKNP
     d->setVlcUserData(data);
 }
 
 void *VlcMedia::vlcUserData()
 {
+    CHECKNP
     return d->vlcUserData();
 }
 
@@ -120,26 +214,31 @@ void *VlcMedia::vlcUserData()
 // meta
 QString VlcMedia::meta(VlcMeta::Type meta)
 {
+    CHECKNP
     return d->meta(meta);
 }
 
 void VlcMedia::setMeta(VlcMeta::Type meta, QString value)
 {
+    CHECKNP
     d->setMeta(meta, value);
 }
 
 bool VlcMedia::saveMeta()
 {
+    CHECKNP
     return d->saveMeta();
 }
 
 void VlcMedia::parse(bool async)
 {
+    CHECKNP
     d->parse(async);
 }
 
 bool VlcMedia::isParsed()
 {
+    CHECKNP
     return d->isParsed();
 }
 
@@ -147,10 +246,12 @@ bool VlcMedia::isParsed()
 // Options
 void VlcMedia::addOption(const QString &options)
 {
+    CHECKNP
     d->addOption(options);
 }
 
 void VlcMedia::addOptionFlag(const QString &options, unsigned flags)
 {
+    CHECKNP
     d->addOptionFlag(options, flags);
 }

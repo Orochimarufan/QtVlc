@@ -16,22 +16,39 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtWidgets/QApplication>
-#include <QtVlc/VlcInstance.h>
+#include <vlc/vlc.h>
 
-#include <iostream>
+#include <QtVlc/error.h>
+#include <cstring>
 
-#include "mainwindow.h"
-
-int main(int argc, char** argv)
+VlcError::VlcError() noexcept :
+    std::exception()
 {
-    QApplication app(argc, argv);
-    std::cout << "QtVlc " << qPrintable(VlcInstance::QtVlc_version()) \
-              << " (" << qPrintable(VlcInstance::QtVlc_version_git()) << ")" << std::endl;
-    std::cout << "built with libvlc-" << qPrintable(VlcInstance::QtVlc_build_libvlc_version()) \
-              << " Qt-" << qPrintable(VlcInstance::QtVlc_build_qt_version()) << std::endl;
-    std::cout << "libvlc " << qPrintable(VlcInstance::libvlc_version()) << std::endl;
-    MainWindow win;
-    win.show();
-    return app.exec();
+    reason = strdup(libvlc_errmsg());
+}
+
+VlcError::~VlcError() noexcept
+{
+    delete reason;
+}
+
+const char *VlcError::what() const noexcept
+{
+    return reason;
+}
+
+VlcError *VlcError::create() noexcept
+{
+    VlcError *e = nullptr;
+    if (libvlc_errmsg())
+        e = new VlcError();
+    libvlc_clearerr();
+    return e;
+}
+
+VlcError *VlcError::createNoClear() noexcept
+{
+    if (libvlc_errmsg())
+        return new VlcError();
+    return nullptr;
 }

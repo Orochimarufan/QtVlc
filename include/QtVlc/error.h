@@ -16,22 +16,44 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtWidgets/QApplication>
-#include <QtVlc/VlcInstance.h>
+#ifndef QTVLC_ERROR_H
+#define QTVLC_ERROR_H
 
-#include <iostream>
+#include <QtVlc/config.h>
 
-#include "mainwindow.h"
+#include <exception>
 
-int main(int argc, char** argv)
+class QtVlc_EXPORT NullPointer : public std::exception
 {
-    QApplication app(argc, argv);
-    std::cout << "QtVlc " << qPrintable(VlcInstance::QtVlc_version()) \
-              << " (" << qPrintable(VlcInstance::QtVlc_version_git()) << ")" << std::endl;
-    std::cout << "built with libvlc-" << qPrintable(VlcInstance::QtVlc_build_libvlc_version()) \
-              << " Qt-" << qPrintable(VlcInstance::QtVlc_build_qt_version()) << std::endl;
-    std::cout << "libvlc " << qPrintable(VlcInstance::libvlc_version()) << std::endl;
-    MainWindow win;
-    win.show();
-    return app.exec();
-}
+    virtual const char *what() const noexcept
+    {
+        return "Tried to work with a Vlc object that points nowhere.";
+    }
+};
+
+class QtVlc_EXPORT VlcError : public std::exception
+{
+public:
+    static VlcError *create() noexcept;
+    static VlcError *createNoClear() noexcept;
+    virtual const char *what() const noexcept;
+    ~VlcError() noexcept;
+
+private:
+    const char *reason;
+    VlcError() noexcept;
+};
+
+#ifndef NO_NULL_CHECK
+#   define CHECKNP if (d == nullptr) throw new NullPointer();
+#else
+#   define CHECKNP
+#endif
+
+#ifndef NO_VLC_ERROR_CHECK
+#   define CHECKERR if (libvlc_errmsg()) throw VlcError::create();
+#else
+#   define CHECKERR
+#endif
+
+#endif // QTVLC_ERROR_H

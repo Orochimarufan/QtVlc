@@ -16,8 +16,8 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef ENUM_H
-#define ENUM_H
+#ifndef QTVLC_ENUM_H
+#define QTVLC_ENUM_H
 
 namespace VlcMeta {
     enum Type {
@@ -62,4 +62,4 @@ namespace VlcState {
     };
 }
 
-#endif // ENUM_H
+#endif // QTVLC_ENUM_H

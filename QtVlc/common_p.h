@@ -59,6 +59,7 @@ public:
 
 #define VLC_WRAPPER_IMPL_CPP_C(T, LIBVLC) \
     T * T :: instance(LIBVLC *ptr) { \
+        if (ptr == nullptr) return nullptr; \
         T * inst; \
         if (instances.contains(ptr)) { \
             inst = instances[ptr]; \

@@ -34,15 +34,11 @@ struct libvlc_instance_t;
 class VlcInstance;
 class VlcMedia;
 class VlcMediaPlayerPrivate;
-class VlcMediaPlayerAudio;
 class IVlcVideoDelegate;
 
 
 /**
  * @brief The VlcMediaPlayer class
- * This class is no mere proxy but holds data,
- * therefore there must only be one instance per underlying libvlc_media_player_t
- * you should only use it by means of the VlcMediaPlayerPtr (QSharedPointer)
  */
 class QtVlc_EXPORT VlcMediaPlayer : public QObject
 {
@@ -51,7 +47,18 @@ class QtVlc_EXPORT VlcMediaPlayer : public QObject
     void d_connect();
 
 public:
+    VlcMediaPlayer();
+    /**
+     * @brief Check if this VlcMediaPlayer is valid
+     * True if not constructed with VlcMediaPlayer().
+     * Most methods will throw a NullPointer exception if called invalid objects.
+     * @return
+     */
+    bool isValid();
+
+
     VlcMediaPlayer(const VlcMediaPlayer &);
+    VlcMediaPlayer &operator =(const VlcMediaPlayer &);
 
     /**
      * @brief VlcMediaPlayer constructor
@@ -77,6 +84,7 @@ public:
      * @return a QSharedPointer pointing to the instance [VlcMediaPlayerPtr]
      */
     VlcMediaPlayer(libvlc_media_player_t *player);
+    VlcMediaPlayer &operator =(libvlc_media_player_t *);
     libvlc_media_player_t *data();
 
     // destructor
@@ -160,8 +168,6 @@ public:
      * @return the IVlcVideoDelegate or nullptr
      */
     IVlcVideoDelegate *videoDelegate();
-
-    VlcMediaPlayerAudio audio();
 
 public Q_SLOTS:
     // player

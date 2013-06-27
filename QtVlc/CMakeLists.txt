@@ -17,6 +17,7 @@
 # *****************************************************************************/
 
 SET(QtVlc_SOURCES
+error.cpp
 VlcInstance.cpp
 VlcInstance_p.cpp
 VlcMedia.cpp
@@ -37,6 +38,7 @@ VlcMediaPlayer_p.h
 SET(QtVlc_HEADERS
 ../include/QtVlc/config.h
 ../include/QtVlc/enum.h
+../include/QtVlc/error.h
 ../include/QtVlc/VlcInstance.h
 ../include/QtVlc/VlcMedia.h
 ../include/QtVlc/VlcMediaPlayer.h

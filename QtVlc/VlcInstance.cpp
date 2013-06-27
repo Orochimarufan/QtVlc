@@ -18,16 +18,34 @@
 
 #include <vlc/vlc.h>
 
-#include "QtVlc/config.h"
-#include "QtVlc/enum.h"
-#include "QtVlc/VlcInstance.h"
+#include <QtVlc/config.h>
+#include <QtVlc/enum.h>
+#include <QtVlc/VlcInstance.h>
 #include "VlcInstance_p.h"
 
+#include <QtVlc/error.h>
+
+bool VlcInstance::isValid()
+{
+    return d != nullptr;
+}
 
 VlcInstance::VlcInstance(const VlcInstance &o) :
     QObject(), d(o.d)
 {
-    d->retain();
+    if (d != nullptr)
+        d->retain();
+}
+
+VlcInstance &VlcInstance::operator =(const VlcInstance &o)
+{
+    if (d != nullptr)
+        d->release();
+
+    d = o.d;
+
+    if (d != nullptr)
+        d->retain();
 }
 
 VlcInstance::VlcInstance(const QStringList &args) :
@@ -42,13 +60,23 @@ VlcInstance::VlcInstance(libvlc_instance_t *p) :
     d = VlcInstancePrivate::instance(p);
 }
 
+VlcInstance &VlcInstance::operator =(libvlc_instance_t *p)
+{
+    if (d != nullptr)
+        d->release();
+
+    d = VlcInstancePrivate::instance(p);
+}
+
 VlcInstance::~VlcInstance()
 {
-    d->release();
+    if (d != nullptr);
+        d->release();
 }
 
 libvlc_instance_t *VlcInstance::data()
 {
+    CHECKNP
     return d->data();
 }
 
@@ -71,6 +99,7 @@ QString VlcInstance::libvlc_changeset()
 // others
 void VlcInstance::setUserAgent(const QString &appString, const QString &httpString)
 {
+    CHECKNP
     d->setUserAgent(appString, httpString);
 }
 
@@ -92,12 +121,7 @@ QString VlcInstance::QtVlc_build_libvlc_version()
     return QStringLiteral(QTVLC_BUILT_LIBVLC_VERSION);
 }
 
-QString VlcInstance::QtVlc_build_libvlccore_version()
-{
-    return QStringLiteral(QTVLC_BUILT_LIBVLCCORE_VERSION);
-}
-
 QString VlcInstance::QtVlc_build_qt_version()
 {
-    return QStringLiteral(QTVLC_BUILT_QTCORE_VERSION);
+    return QStringLiteral(QTVLC_BUILT_QT_VERSION);
 }

@@ -19,7 +19,7 @@
 #include <QtVlc/VlcMediaPlayer.h>
 #include <QtVlc/VlcInstance.h>
 #include <QtVlc/VlcMedia.h>
-#include <QtVlc/VlcMediaPlayerAudio.h>
+#include <QtVlc/error.h>
 
 #include "VlcMediaPlayer_p.h"
 
@@ -45,11 +45,43 @@ void VlcMediaPlayer::d_connect()
 #undef SIG
 }
 
+VlcMediaPlayer::VlcMediaPlayer() :
+    QObject(), d(nullptr)
+{
+}
+
+bool VlcMediaPlayer::isValid()
+{
+    return d != nullptr;
+}
+
 VlcMediaPlayer::VlcMediaPlayer(const VlcMediaPlayer &o) :
     QObject(), d(o.d)
 {
-    d->retain();
-    d_connect();
+    if (d != nullptr)
+    {
+        d->retain();
+        d_connect();
+    }
+}
+
+VlcMediaPlayer &VlcMediaPlayer::operator =(const VlcMediaPlayer &o)
+{
+    if (d != nullptr)
+    {
+        disconnect(d);
+        d->release();
+    }
+
+    d = o.d;
+
+    if (d != nullptr)
+    {
+        d->retain();
+        d_connect();
+    }
+
+    return *this;
 }
 
 VlcMediaPlayer::VlcMediaPlayer(const VlcInstance &instance) :
@@ -70,117 +102,151 @@ VlcMediaPlayer::VlcMediaPlayer(libvlc_media_player_t *player) :
     QObject()
 {
     d = VlcMediaPlayerPrivate::instance(player);
-    d_connect();
+
+    if (d != nullptr)
+        d_connect();
+}
+
+VlcMediaPlayer &VlcMediaPlayer::operator =(libvlc_media_player_t *player)
+{
+    if (d != nullptr)
+    {
+        disconnect(d);
+        d->release();
+    }
+
+    d = VlcMediaPlayerPrivate::instance(player);
+
+    if (d != nullptr)
+        d_connect();
+
+    return *this;
 }
 
 VlcMediaPlayer::~VlcMediaPlayer()
 {
-    d->release();
+    if (d != nullptr)
+        d->release();
 }
 
 libvlc_media_player_t *VlcMediaPlayer::data()
 {
+    CHECKNP
     return d->data();
 }
 
 void VlcMediaPlayer::setMedia(libvlc_media_t *media)
 {
+    CHECKNP
     d->setMedia(media);
 }
 
 VlcMedia VlcMediaPlayer::media()
 {
+    CHECKNP
     return VlcMedia(d->media());
 }
 
 libvlc_media_t *VlcMediaPlayer::media_()
 {
+    CHECKNP
     return d->media();
 }
 
 void VlcMediaPlayer::open(libvlc_media_t *media)
 {
+    CHECKNP
     d->setMedia(media);
     d->play();
 }
 
 void VlcMediaPlayer::open(const VlcMedia &media)
 {
+    CHECKNP
     d->setMedia(getref<VlcMedia>(media)->data());
     d->play();
 }
 
 qint64 VlcMediaPlayer::length() const
 {
+    CHECKNP
     return d->length();
 }
 
 qint64 VlcMediaPlayer::time() const
 {
+    CHECKNP
     return d->time();
 }
 
 void VlcMediaPlayer::setTime(const qint64 &time)
 {
+    CHECKNP
     d->setTime(time);
 }
 
 float VlcMediaPlayer::position() const
 {
+    CHECKNP
     return d->position();
 }
 
 void VlcMediaPlayer::setPosition(const float &position)
 {
+    CHECKNP
     d->setPosition(position);
 }
 
 void VlcMediaPlayer::setVideoWidget(WId widget)
 {
+    CHECKNP
     d->setVideoWidget(widget);
 }
 
 void VlcMediaPlayer::setVideoDelegate(IVlcVideoDelegate *delegate)
 {
+    CHECKNP
     d->setVideoDelegate(delegate);
 }
 
 WId VlcMediaPlayer::videoWidget()
 {
+    CHECKNP
     return d->videoWidget();
 }
 
 IVlcVideoDelegate *VlcMediaPlayer::videoDelegate()
 {
+    CHECKNP
     return d->videoDelegate();
 }
 
 void VlcMediaPlayer::play()
 {
+    CHECKNP
     d->play();
 }
 
 void VlcMediaPlayer::pause()
 {
+    CHECKNP
     d->setPause(true);
 }
 
 void VlcMediaPlayer::resume()
 {
+    CHECKNP
     d->setPause(false);
 }
 
 void VlcMediaPlayer::togglePause()
 {
+    CHECKNP
     d->pause();
 }
 
 void VlcMediaPlayer::stop()
 {
+    CHECKNP
     d->stop();
-}
-
-VlcMediaPlayerAudio VlcMediaPlayer::audio()
-{
-    return VlcMediaPlayerAudio(d);
 }

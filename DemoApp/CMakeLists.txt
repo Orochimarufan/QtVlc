@@ -17,6 +17,11 @@
 # *****************************************************************************/
 
 project(QtVlc-DemoApp)
+IF(WIN32)
+	cmake_minimum_required(VERSION 2.8.11)
+ELSE()
+	cmake_minimum_required(VERSION 2.8.10)
+ENDIF()
 
 SET(DemoApp_SOURCES
 main.cpp

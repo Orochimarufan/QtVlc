@@ -16,8 +16,8 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef VLCMEDIA_H
-#define VLCMEDIA_H
+#ifndef QTVLC_VLCMEDIA_H
+#define QTVLC_VLCMEDIA_H
 
 #include <QtCore/QObject>
 
@@ -35,9 +35,21 @@ class QtVlc_EXPORT VlcMedia : public QObject
 {
     Q_OBJECT
     VlcMediaPrivate *d;
+    void d_connect();
 
 public:
+    VlcMedia();
+    /**
+     * @brief Check if this VlcMedia is valid
+     * True if not constructed with VlcMedia().
+     * Most methods will throw a NullPointer exception if called invalid objects.
+     * @return
+     */
+    bool isValid();
+
+    VlcMedia &operator =(const VlcMedia &);
     VlcMedia(const VlcMedia &);
+    VlcMedia &operator =(libvlc_media_t *);
     VlcMedia(libvlc_media_t *);
 
     explicit VlcMedia(libvlc_instance_t *instance, QString location, bool local = false);
@@ -142,4 +154,4 @@ Q_SIGNALS:
     void stateChanged(const VlcState::Type &);
 };
 
-#endif // VLCMEDIA_H
+#endif // QTVLC_VLCMEDIA_H

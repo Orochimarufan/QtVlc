@@ -16,8 +16,8 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef VLCINSTANCE
-#define VLCINSTANCE
+#ifndef QTVLC_VLCINSTANCE_H
+#define QTVLC_VLCINSTANCE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
@@ -33,11 +33,21 @@ class QtVlc_EXPORT VlcInstance : public QObject
     VlcInstancePrivate *d;
 
 public:
+    /**
+     * @brief Check if this VlcInstance is valid
+     * True if not constructed with VlcInstance(nullptr).
+     * Most methods will throw a NullPointer exception if called invalid objects.
+     * @return
+     */
+    bool isValid();
+
     VlcInstance(const VlcInstance &);
+    VlcInstance &operator =(const VlcInstance &);
 
     explicit VlcInstance(const QStringList &args = QStringList());
 
     VlcInstance(libvlc_instance_t *);
+    VlcInstance &operator =(libvlc_instance_t *);
     libvlc_instance_t *data(); // refcount is NOT increased!
 
     virtual ~VlcInstance();
@@ -52,8 +62,7 @@ public:
     static QString QtVlc_version();
     static QString QtVlc_version_git();
     static QString QtVlc_build_libvlc_version();
-    static QString QtVlc_build_libvlccore_version();
     static QString QtVlc_build_qt_version();
 };
 
-#endif // VLCINSTANCE
+#endif // QTVLC_VLCINSTANCE_H

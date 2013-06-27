@@ -23,6 +23,7 @@
 
 #include <QtVlc/VlcInstance.h>
 #include <QtVlc/VlcMediaPlayer.h>
+#include <QtVlc/VlcMediaPlayerAudio.h>
 #include <QtVlc/VlcMedia.h>
 
 
@@ -40,15 +41,17 @@ public:
     
 private:
     Ui::MainWindow *ui;
-    VlcInstance *inst;
-    VlcMediaPlayer *player;
-    VlcMedia *media;
+    VlcInstance inst;
+    VlcMediaPlayer player;
+    VlcMediaPlayerAudio audio;
+    VlcMedia media;
 
 public slots:
     void on_actionOpen_triggered();
     void on_position_sliderMoved(int);
     void setPosition(const float &);
     void on_volume_sliderMoved(int);
+    void onStateChanged(const VlcState::Type &);
 };
 
 #endif // MAINWINDOW_H

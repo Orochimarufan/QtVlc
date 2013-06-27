@@ -41,11 +41,7 @@
        </widget>
       </item>
       <item>
-       <widget class="TimeLabel" name="timeLabel">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+       <widget class="TimeLabel" name="timeLabel"/>
       </item>
      </layout>
     </item>
