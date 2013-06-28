@@ -62,6 +62,8 @@ public:
     bool isPausable() const;
     bool isSeekable() const;
 
+    VlcState::Type state();
+
     // Audio
     int audio_volume() const;
     void audio_setVolume(const int &);

@@ -296,6 +296,12 @@ bool VlcMediaPlayerPrivate::isSeekable() const
     return libvlc_media_player_is_seekable(d);
 }
 
+VlcState::Type VlcMediaPlayerPrivate::state()
+{
+    if (d)
+        return static_cast<VlcState::Type>(libvlc_media_player_get_state(d));
+}
+
 // Audio
 int VlcMediaPlayerPrivate::audio_volume() const
 {

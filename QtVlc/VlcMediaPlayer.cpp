@@ -215,6 +215,13 @@ void VlcMediaPlayer::setPosition(const float &position)
     d->setPosition(position);
 }
 
+// state
+VlcState::Type VlcMediaPlayer::state()
+{
+    CHECKNP
+    return d->state();
+}
+
 // video widget
 void VlcMediaPlayer::setVideoWidget(WId widget)
 {

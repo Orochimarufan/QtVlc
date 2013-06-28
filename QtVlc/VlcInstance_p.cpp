@@ -19,6 +19,7 @@
 #include "VlcInstance_p.h"
 
 #include <cstdlib>
+#include <cstdio>
 
 #include <QStringList>
 
@@ -68,5 +69,4 @@ VlcInstancePrivate *VlcInstancePrivate::globalInstance()
 void VlcInstancePrivate::deleteGlobalInstance() noexcept
 {
     delete global;
-    global = nullptr;
 }

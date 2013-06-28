@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>QtVlc DemoApp</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../vlc/modules/gui/qt4/vlc.qrc">
+    <normaloff>:/logo/vlc128.png</normaloff>:/logo/vlc128.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -48,37 +52,26 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="btn_play">
-        <property name="text">
-         <string>Play</string>
+       <widget class="PlayButton" name="playButton">
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btn_pause">
-        <property name="text">
-         <string>Pause</string>
+       <widget class="QToolButton" name="stopButton">
+        <property name="icon">
+         <iconset resource="../vlc/modules/gui/qt4/vlc.qrc">
+          <normaloff>:/toolbar/stop_b</normaloff>:/toolbar/stop_b</iconset>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_resume">
-        <property name="text">
-         <string>Resume</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_toggle">
-        <property name="text">
-         <string>Toggle Pause</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_stop">
-        <property name="text">
-         <string>Stop</string>
+        <property name="iconSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -96,7 +89,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="SoundSlider" name="volume"/>
+       <widget class="SoundWidget" name="volume" native="true"/>
       </item>
      </layout>
     </item>
@@ -150,11 +143,19 @@
    <header location="global">QtVlcWidgets/SeekSlider.h</header>
   </customwidget>
   <customwidget>
-   <class>SoundSlider</class>
-   <extends>QSlider</extends>
-   <header location="global">QtVlcWidgets/SoundSlider.h</header>
+   <class>SoundWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtVlcWidgets/SoundWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PlayButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">QtVlcWidgets/SpecialButtons.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../vlc/modules/gui/qt4/vlc.qrc"/>
+ </resources>
  <connections/>
 </ui>

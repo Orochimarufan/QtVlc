@@ -101,7 +101,7 @@ public:
         INIT_FUNC (); \
     } \
     T :: ~ T () { \
-        qDebug("delete " #T); \
+/*        qDebug("delete " #T); */\
         VLC_WRAPPER_IMPL_EXIT() \
         EXIT_FUNC (); \
         LIBVLC_PREFIX ## _release(d); \

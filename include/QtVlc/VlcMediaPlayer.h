@@ -139,7 +139,13 @@ public:
      */
     void setPosition(const float &pos);
 
-    // window id
+    // state
+    /**
+     * @brief Get the current playback state
+     */
+    VlcState::Type state();
+
+    // window
     /**
      * @brief Set the Video Widget ID
      * Calls are ignored if a IVlcVideoDelegate is set!
@@ -165,6 +171,7 @@ public:
      */
     IVlcVideoDelegate *videoDelegate();
 
+    // audio
     VlcMediaPlayerAudio audio();
 
 public Q_SLOTS:

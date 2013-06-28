@@ -11,8 +11,12 @@ src_dir = os.path.normpath(sys.argv[2])
 make_cmd = sys.argv[3:]
 
 stamp = os.path.join(bin_dir, "stamp", "build")
+stamp_last = int(open(stamp).read())
+stamp_time = os.stat(stamp).st_mtime
 
-if not os.path.exists(stamp) or int(open(stamp).read()) < os.stat(stamp).st_mtime:
+#print(stamp_last, stamp_time)
+
+if not os.path.exists(stamp) or stamp_last < stamp_time:
     subprocess.check_call(["./compile" if sys.stdout.isatty() else "make"] + make_cmd, cwd=src_dir)
 
     open(stamp, "w").write(str(int(time.time()) + 10))

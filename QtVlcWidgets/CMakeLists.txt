@@ -23,6 +23,8 @@ TimeTooltip.cpp
 SeekStyle.cpp
 SeekSlider.cpp
 SoundSlider.cpp
+SoundWidget.cpp
+SpecialButtons.cpp
 )
 
 SET(QtVlcWidgets_HEADERS
@@ -33,6 +35,8 @@ SET(QtVlcWidgets_HEADERS
 ../include/QtVlcWidgets/TimeTooltip.h
 ../include/QtVlcWidgets/SeekSlider.h
 ../include/QtVlcWidgets/SoundSlider.h
+../include/QtVlcWidgets/SoundWidget.h
+../include/QtVlcWidgets/SpecialButtons.h
 )
 
 SET(QtVlcWidgets_HEADERS_PRIVATE

@@ -48,9 +48,13 @@ private:
 public slots:
     void on_actionOpen_triggered();
     void on_position_sliderMoved(int);
-    void setPosition(const float &);
-    void on_volume_sliderMoved(int);
+    void on_volume_volumeChanged(int);
+    void on_volume_muteChanged(bool);
+    void on_playButton_clicked();
+
     void onStateChanged(const VlcState::Type &);
+    void onPositionChanged(const float &);
+    void onMediaChanged(libvlc_media_t *);
 };
 
 #endif // MAINWINDOW_H
