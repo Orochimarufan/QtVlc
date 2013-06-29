@@ -29,7 +29,7 @@ VlcMediaPrivate::VlcMediaPrivate(libvlc_instance_t *instance, const QString &mrl
     else
         d = libvlc_media_new_location(instance, mrl.toUtf8().data());
 
-    VLC_WRAPPER_IMPL_INIT()
+    VLC_WRAPPER_IMPL_INIT();
 
     attach_events();
 }
@@ -39,7 +39,7 @@ VlcMediaPrivate::VlcMediaPrivate(libvlc_instance_t *instance, int fd) :
 {
     d = libvlc_media_new_fd(instance, fd);
 
-    VLC_WRAPPER_IMPL_INIT()
+    VLC_WRAPPER_IMPL_INIT();
 
     attach_events();
 }
@@ -196,6 +196,6 @@ void VlcMediaPrivate::event_cb(const libvlc_event_t *e, void *o)
         emit p->stateChanged(static_cast<VlcState::Type>(e->u.media_state_changed.new_state));
         break;
     default:
-        qDebug("VlcMedia: unknown Event: %i", e->type);
+        qDebug("VlcMedia: unknown Event: %i (%s)", e->type, libvlc_event_type_name(e->type));
     }
 }

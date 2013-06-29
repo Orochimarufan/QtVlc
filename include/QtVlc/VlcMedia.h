@@ -52,8 +52,10 @@ public:
     // copy, assign & libvlc primitive
     VlcMedia &operator =(const VlcMedia &);
     VlcMedia(const VlcMedia &);
+    bool operator ==(const VlcMedia &);
     VlcMedia &operator =(libvlc_media_t *);
     VlcMedia(libvlc_media_t *);
+    bool operator ==(libvlc_media_t *);
     libvlc_media_t *data();
 
     // NULL constructor

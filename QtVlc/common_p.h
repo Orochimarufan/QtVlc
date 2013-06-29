@@ -47,17 +47,21 @@ public:
     }
 };
 
+struct __Janitor__;
+void __Janitor__run();
+
 #define VLC_WRAPPER_IMPL_PRIVATE(T, S) \
     S * d; \
     static QHash<S *, T *> instances; \
-    T(S *);
+    T(S *); \
+    friend class __Janitor__;
 
 #define VLC_WRAPPER_IMPL_PUBLIC(T, LIBVLC) \
     static T *instance(LIBVLC *); \
     virtual ~ T (); \
     LIBVLC *data();
 
-#define VLC_WRAPPER_IMPL_CPP_C(T, LIBVLC) \
+#define VLC_WRAPPER_IMPL_CPP_A(T, LIBVLC) \
     T * T :: instance(LIBVLC *ptr) { \
         if (ptr == nullptr) return nullptr; \
         T * inst; \
@@ -74,46 +78,36 @@ public:
     QHash<LIBVLC *, T *> T :: instances;
 
 #define VLC_WRAPPER_IMPL_INIT() \
-    instances[d] = this;
+    instances[d] = this
 
 #define VLC_WRAPPER_IMPL_EXIT() \
-    instances.remove(d);
+    instances.remove(d)
 
-#define VLC_WRAPPER_IMPL_INST(T, LIBVLC, LIBVLC_PREFIX) \
+#define VLC_WRAPPER_IMPL_EXIT_DEBUG(T) qDebug("Delete " #T);
+//#define VLC_WRAPPER_IMPL_EXIT_DEBUG(T)
+
+#define VLC_WRAPPER_IMPL_CPP_B(T, LIBVLC, LIBVLC_PREFIX, INIT, EXIT) \
     T :: T (LIBVLC *ptr) : \
         VlcWrapperImpl(), d(ptr) \
     { \
         LIBVLC_PREFIX ## _retain(d); \
-        VLC_WRAPPER_IMPL_INIT() \
+        VLC_WRAPPER_IMPL_INIT(); \
+        INIT \
     } \
     T :: ~ T () { \
-/*        qDebug("delete " #T); */\
-        VLC_WRAPPER_IMPL_EXIT() \
-        LIBVLC_PREFIX ## _release(d); \
-    }
-
-#define VLC_WRAPPER_IMPL_INST2(T, LIBVLC, LIBVLC_PREFIX, INIT_FUNC, EXIT_FUNC) \
-    T :: T (LIBVLC *ptr) : \
-        VlcWrapperImpl(), d(ptr) \
-    { \
-        LIBVLC_PREFIX ## _retain(d); \
-        VLC_WRAPPER_IMPL_INIT() \
-        INIT_FUNC (); \
-    } \
-    T :: ~ T () { \
-/*        qDebug("delete " #T); */\
-        VLC_WRAPPER_IMPL_EXIT() \
-        EXIT_FUNC (); \
+        VLC_WRAPPER_IMPL_EXIT_DEBUG(T) \
+        VLC_WRAPPER_IMPL_EXIT(); \
+        EXIT \
         LIBVLC_PREFIX ## _release(d); \
     }
 
 #define VLC_WRAPPER_IMPL_CPP(T, LIBVLC, LIBVLC_PREFIX) \
-    VLC_WRAPPER_IMPL_CPP_C(T, LIBVLC) \
-    VLC_WRAPPER_IMPL_INST(T, LIBVLC, LIBVLC_PREFIX)
+    VLC_WRAPPER_IMPL_CPP_A(T, LIBVLC) \
+    VLC_WRAPPER_IMPL_CPP_B(T, LIBVLC, LIBVLC_PREFIX,,)
 
 #define VLC_WRAPPER_IMPL_CPP2(T, LIBVLC, LIBVLC_PREFIX, INIT_FUNC, EXIT_FUNC) \
-    VLC_WRAPPER_IMPL_CPP_C(T, LIBVLC) \
-    VLC_WRAPPER_IMPL_INST2(T, LIBVLC, LIBVLC_PREFIX, INIT_FUNC, EXIT_FUNC)
+    VLC_WRAPPER_IMPL_CPP_A(T, LIBVLC) \
+    VLC_WRAPPER_IMPL_CPP_B(T, LIBVLC, LIBVLC_PREFIX, INIT_FUNC ();, EXIT_FUNC ();)
 
 // cannot call members on const references
 template <class T>
@@ -121,5 +115,7 @@ inline T *getref(const T &in)
 {
     return (T *)&in;
 }
+
+#define D if (d)
 
 #endif // QTVLC_COMMON_P_H

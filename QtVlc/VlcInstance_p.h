@@ -31,7 +31,6 @@ class VlcInstancePrivate : public VlcWrapperImpl
     VLC_WRAPPER_IMPL_PRIVATE(VlcInstancePrivate, libvlc_instance_t)
 
     static VlcInstancePrivate *global;
-    static void deleteGlobalInstance() noexcept;
 
 public:
     VLC_WRAPPER_IMPL_PUBLIC(VlcInstancePrivate, libvlc_instance_t)

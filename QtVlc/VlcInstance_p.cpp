@@ -18,9 +18,6 @@
 
 #include "VlcInstance_p.h"
 
-#include <cstdlib>
-#include <cstdio>
-
 #include <QStringList>
 
 #include <QtVlc/enum.h>
@@ -47,7 +44,7 @@ VlcInstancePrivate::VlcInstancePrivate(const QStringList &args) :
     else
         abort();
 
-    VLC_WRAPPER_IMPL_INIT()
+    VLC_WRAPPER_IMPL_INIT();
 }
 
 void VlcInstancePrivate::setUserAgent(const QString &appString, const QString &httpString)
@@ -55,18 +52,21 @@ void VlcInstancePrivate::setUserAgent(const QString &appString, const QString &h
     libvlc_set_user_agent(d, appString.toLocal8Bit().data(), httpString.toLocal8Bit().data());
 }
 
+#ifndef __GNUC__
+#include <cstdlib>
+#endif
+
 VlcInstancePrivate *VlcInstancePrivate::globalInstance()
 {
     if (global == nullptr)
+#ifdef __GNUC__
+        global = new VlcInstancePrivate(QStringList());
+#else
     {
         global = new VlcInstancePrivate(QStringList());
-        atexit(&VlcInstancePrivate::deleteGlobalInstance);
+        atexit(&__Janitor__run);
     }
+#endif
 
     return global;
-}
-
-void VlcInstancePrivate::deleteGlobalInstance() noexcept
-{
-    delete global;
 }

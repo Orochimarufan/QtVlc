@@ -43,6 +43,16 @@ bool VlcMedia::isValid()
     return d != nullptr;
 }
 
+bool VlcMedia::operator ==(const VlcMedia &o)
+{
+    return d == o.d;
+}
+
+bool VlcMedia::operator ==(libvlc_media_t *p_md)
+{
+    return d->data() == p_md;
+}
+
 // assign
 VlcMedia &VlcMedia::operator =(const VlcMedia &other)
 {

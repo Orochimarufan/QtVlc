@@ -26,7 +26,7 @@ VlcMediaPlayerPrivate::VlcMediaPlayerPrivate(libvlc_instance_t *instance) :
 {
     d = libvlc_media_player_new(instance);
 
-    VLC_WRAPPER_IMPL_INIT()
+    VLC_WRAPPER_IMPL_INIT();
 
     attach_events();
 }
@@ -182,7 +182,7 @@ void VlcMediaPlayerPrivate::event_cb(const libvlc_event_t *e, void *o)
         emit p->voutChanged(e->u.media_player_vout.new_count);
         break;
     default:
-        qDebug("VlcMediaPlayer: unknown event: %i", e->type);
+        qDebug("VlcMediaPlayer: unknown Event: %i (%s)", e->type, libvlc_event_type_name(e->type));
     }
 }
 

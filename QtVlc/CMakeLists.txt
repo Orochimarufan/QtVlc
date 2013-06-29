@@ -17,6 +17,7 @@
 # *****************************************************************************/
 
 SET(QtVlc_SOURCES
+common_p.cpp
 error.cpp
 VlcInstance.cpp
 VlcInstance_p.cpp
@@ -26,6 +27,9 @@ VlcMediaPlayer.cpp
 VlcMediaPlayer_p.cpp
 VlcMediaPlayerAudio.cpp
 #VlcMediaPlayerVideo.cpp
+AbstractMediaList.cpp
+VlcMediaList.cpp
+VlcMediaList_p.cpp
 )
 
 SET(QtVlc_HEADERS_PRIVATE
@@ -33,6 +37,7 @@ common_p.h
 VlcInstance_p.h
 VlcMedia_p.h
 VlcMediaPlayer_p.h
+VlcMediaList_p.h
 )
 
 SET(QtVlc_HEADERS
@@ -45,6 +50,8 @@ SET(QtVlc_HEADERS
 ../include/QtVlc/IVlcVideoDelegate.h
 ../include/QtVlc/VlcMediaPlayerAudio.h
 #../include/QtVlc/VlcMediaPlayerVideo.h
+../include/QtVlc/AbstractMediaList.h
+../include/QtVlc/VlcMediaList.h
 )
 
 
