@@ -46,7 +46,7 @@ IF(BUILD_VLC)
 	SET(VLC_SOURCE_DIR "${PROJECT_SOURCE_DIR}/vlc")
 	SET(VLC_BINARY_DIR "${PROJECT_BINARY_DIR}/vlc")
 
-	FILE(WRITE "${VLC_SOURCE_DIR}/.git" "gitdir: ${PROJECT_SOURCE_DIR}/.git/modules/vlc")
+	#FILE(WRITE "${VLC_SOURCE_DIR}/.git" "gitdir: ${PROJECT_SOURCE_DIR}/.git/modules/vlc")
 
 	IF(GIT)
 		EXECUTE_PROCESS(
@@ -73,6 +73,13 @@ IF(BUILD_VLC)
 		COMMAND ./bootstrap
 		DEPENDERS configure
 		WORKING_DIRECTORY "${VLC_SOURCE_DIR}"
+	)
+	add_custom_command(
+		OUTPUT "${VLC_BINARY_DIR}/lib/libvlc.so"
+		COMMAND true
+	)
+	add_custom_target(libvlc
+		DEPENDS "${VLC_BINARY_DIR}/lib/libvlc.so"
 	)
 	SET(LIBVLC_INCLUDE_DIRS "${VLC_BINARY_DIR}/include")
 	SET(LIBVLC_LIBRARIES "${VLC_BINARY_DIR}/lib/libvlc.so")
@@ -140,7 +147,7 @@ ELSE()
 ENDIF()
 
 ######## Set CMake options ########
-MESSAGE(STATUS "Cofiguring...")
+MESSAGE(STATUS "Configuring...")
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 

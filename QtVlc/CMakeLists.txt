@@ -67,6 +67,10 @@ QT5_USE_MODULES(QtVlc Core)
 #target_link_libraries(QtVlc ${LIBVLC_LIBRARIES} ${LIBVLCCORE_LIBRARIES})
 target_link_libraries(QtVlc ${LIBVLC_LIBRARIES})
 
+IF(BUILD_VLC)
+	add_dependencies(QtVlc libvlc)
+ENDIF(BUILD_VLC)
+
 GET_PROPERTY(QtVlc_LIBRARY TARGET QtVlc PROPERTY LOCATION)
 SET(QtVlc_LIBRARY ${QtVlc_LIBRARY} CACHE INTERNAL "")
 
