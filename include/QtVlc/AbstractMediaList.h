@@ -30,7 +30,7 @@ class QtVlc_EXPORT AbstractMediaList : public QObject
     Q_OBJECT
 
 public:
-    virtual ~AbstractMediaList() {}
+    virtual ~AbstractMediaList();
 
     // ***** Virtual *****
     // read methods

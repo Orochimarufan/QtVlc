@@ -19,6 +19,9 @@
 #include <QtVlc/AbstractMediaList.h>
 #include <QtVlc/VlcMedia.h>
 
+AbstractMediaList::~AbstractMediaList()
+{}
+
 // optional
 void AbstractMediaList::append(const VlcMedia &media)
 {

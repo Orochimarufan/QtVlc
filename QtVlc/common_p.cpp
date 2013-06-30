@@ -12,6 +12,7 @@
 #include "VlcMedia_p.h"
 #include "VlcMediaPlayer_p.h"
 #include "VlcMediaList_p.h"
+#include "VlcMediaListPlayer_p.h"
 #endif
 
 struct __Janitor__
@@ -25,22 +26,27 @@ struct __Janitor__
 #ifndef NO_LEAK_DETECTION
     static void detectLeaks()
     {
-        detectLeaksOf<libvlc_media_player_t, VlcMediaPlayerPrivate>(VlcMediaPlayerPrivate::instances);
-        detectLeaksOf<libvlc_media_list_t, VlcMediaListPrivate>(VlcMediaListPrivate::instances);
-        detectLeaksOf<libvlc_media_t, VlcMediaPrivate>(VlcMediaPrivate::instances);
-        detectLeaksOf<libvlc_instance_t, VlcInstancePrivate>(VlcInstancePrivate::instances);
+        detectLeaksOf<VlcMediaListPlayerPrivate>();
+        detectLeaksOf<VlcMediaPlayerPrivate>();
+        detectLeaksOf<VlcMediaListPrivate>();
+        detectLeaksOf<VlcMediaPrivate>();
+        detectLeaksOf<VlcInstancePrivate>();
     }
 
-    template <typename S, typename T>
-    static void detectLeaksOf(QHash<S *, T *> map)
+    template <typename T>
+    static void detectLeaksOf()
     {
-        if (!map.isEmpty())
+        if (!T::instances.isEmpty())
         {
-            qWarning("Leaking %i %s instance(s)!", map.count(), T::staticMetaObject.className());
-            auto v = map.values();
+            qWarning("Leaking %i %s instance(s)!", T::instances.count(), T::staticMetaObject.className());
+            QList<T *> v = T::instances.values();
             QListIterator<T *> it(v);
             while (it.hasNext())
-                delete it.next();
+            {
+                T *self = it.next();
+                qWarning("Deleting %s instance with %i references.", T::staticMetaObject.className(), self->ref.load());
+                delete self;
+            }
         }
     }
 #endif

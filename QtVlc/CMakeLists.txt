@@ -30,6 +30,9 @@ VlcMediaPlayerAudio.cpp
 AbstractMediaList.cpp
 VlcMediaList.cpp
 VlcMediaList_p.cpp
+AbstractMediaListPlayer.cpp
+VlcMediaListPlayer.cpp
+VlcMediaListPlayer_p.cpp
 )
 
 SET(QtVlc_HEADERS_PRIVATE
@@ -38,6 +41,7 @@ VlcInstance_p.h
 VlcMedia_p.h
 VlcMediaPlayer_p.h
 VlcMediaList_p.h
+VlcMediaListPlayer_p.h
 )
 
 SET(QtVlc_HEADERS
@@ -52,6 +56,8 @@ SET(QtVlc_HEADERS
 #../include/QtVlc/VlcMediaPlayerVideo.h
 ../include/QtVlc/AbstractMediaList.h
 ../include/QtVlc/VlcMediaList.h
+../include/QtVlc/AbstractMediaListPlayer.h
+../include/QtVlc/VlcMediaListPlayer.h
 )
 
 

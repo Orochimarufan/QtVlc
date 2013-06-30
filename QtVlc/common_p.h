@@ -28,6 +28,7 @@ class VlcWrapperImpl : public QObject
     Q_OBJECT
 
     QAtomicInt ref;
+    friend class __Janitor__;
 
 public:
     VlcWrapperImpl() : QObject()
@@ -47,7 +48,6 @@ public:
     }
 };
 
-struct __Janitor__;
 void __Janitor__run();
 
 #define VLC_WRAPPER_IMPL_PRIVATE(T, S) \

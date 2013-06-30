@@ -127,7 +127,10 @@ void VlcMediaList::setMedia(const VlcMedia &m)
 VlcMedia VlcMediaList::media()
 {
     CHECKNP
-    return VlcMedia(d->media());
+    libvlc_media_t *m1 = d->media();
+    VlcMedia m2 = VlcMedia(m1);
+    libvlc_media_release(m1);
+    return m2;
 }
 
 
@@ -153,7 +156,10 @@ int VlcMediaList::length() const
 VlcMedia VlcMediaList::at(int index)
 {
     CHECKNP WITH_LOCK;
-    return VlcMedia(d->itemAtIndex(index));
+    libvlc_media_t *m1 = d->itemAtIndex(index);
+    VlcMedia m2 = VlcMedia(m1);
+    libvlc_media_release(m1);
+    return m2;
 }
 
 int VlcMediaList::indexOf(const VlcMedia &media, int from)
