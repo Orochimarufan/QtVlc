@@ -67,7 +67,6 @@ IF(BUILD_VLC)
 		PATCH_COMMAND sh ${PROJECT_SOURCE_DIR}/bin/patch_vlc.sh
 		CONFIGURE_COMMAND sh -c "./configure \"--prefix=${VLC_BINARY_DIR}\" --disable-qt --disable-rpath \"--with-kde-solid=${VLC_BINARY_DIR}/tmp\" ${VLC_CONFIGURE} && touch \"${VLC_BINARY_DIR}/stamp/build\""
 		BUILD_COMMAND python "${PROJECT_SOURCE_DIR}/bin/build_vlc.py" "${VLC_BINARY_DIR}" "${VLC_SOURCE_DIR}" install -j4
-		STEP_TARGETS "${VLC_BINARY_DIR}/lib/libvlc.so"
 	)
 	ExternalProject_Add_Step(VLC bootstrap
 		COMMAND ./bootstrap
@@ -76,6 +75,7 @@ IF(BUILD_VLC)
 	)
 	add_custom_command(
 		OUTPUT "${VLC_BINARY_DIR}/lib/libvlc.so"
+		DEPENDS VLC
 		COMMAND true
 	)
 	add_custom_target(libvlc

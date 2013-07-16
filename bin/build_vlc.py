@@ -12,7 +12,10 @@ make_cmd = sys.argv[3:]
 
 stamp = os.path.join(bin_dir, "stamp", "build")
 if os.path.exists(stamp):
-    stamp_last = int(open(stamp).read())
+    try:
+        stamp_last = int(open(stamp).read())
+    except:
+        stamp_last = 0
     stamp_time = os.stat(stamp).st_mtime
 else:
     stamp_last = 0
