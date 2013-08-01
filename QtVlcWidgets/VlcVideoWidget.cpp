@@ -48,10 +48,10 @@
 #include <QtGui/QPainter>
 #include <QtGui/QBitmap>
 
-#ifdef Q_WS_X11
-#   include <qx11info_x11.h>
-#   include <X11/Xlib.h>
-#endif
+//#ifdef Q_WS_X11
+//#   include <qx11info_x11.h>
+//#   include <X11/Xlib.h>
+//#endif
 
 #include <cassert>
 
@@ -81,12 +81,12 @@ VlcVideoWidget::~VlcVideoWidget()
 
 void VlcVideoWidget::sync()
 {
-#ifdef Q_WS_X11
+//#ifdef Q_WS_X11
     /* Make sure the X server has processed all requests.
      * This protects other threads using distinct connections from getting
      * the video widget window in an inconsistent states. */
-    XSync( QX11Info::display(), False );
-#endif
+//    XSync( QX11Info::display(), False );
+//#endif
 }
 
 /**
@@ -118,15 +118,15 @@ WId VlcVideoWidget::request(bool b_keep_size, unsigned int width, unsigned int h
        management */
     /* This is currently disabled on X11 as it does not seem to improve
      * performance, but causes the video widget to be transparent... */
-#if !defined (Q_WS_X11) && !defined (Q_WS_QPA)
-    stable->setAttribute(Qt::WA_PaintOnScreen, true);
-#endif
+//#if !defined (Q_WS_X11) && !defined (Q_WS_QPA)
+//    stable->setAttribute(Qt::WA_PaintOnScreen, true);
+//#endif
 
     if (default_widget)
         layout->removeWidget(default_widget);
     layout->addWidget(stable);
 
-#ifdef Q_WS_X11
+//#ifdef Q_WS_X11
     /* HACK: Only one X11 client can subscribe to mouse button press events.
      * VLC currently handles those in the video display.
      * Force Qt4 to unsubscribe from mouse press and release events. */
@@ -137,7 +137,7 @@ WId VlcVideoWidget::request(bool b_keep_size, unsigned int width, unsigned int h
     XGetWindowAttributes( dpy, w, &attr );
     attr.your_event_mask &= ~(ButtonPressMask|ButtonReleaseMask);
     XSelectInput( dpy, w, attr.your_event_mask );*/
-#endif
+//#endif
     sync();
     return stable->winId();
 }
