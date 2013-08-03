@@ -44,8 +44,9 @@
 #define QTVLC_WIDGETS_SPECIALBUTTONS_H
 
 #include <QtWidgets/QToolButton>
+#include <QtVlcWidgets/config.h>
 
-class PlayButton : public QToolButton
+class QtVlcWidgets_EXPORT PlayButton : public QToolButton
 {
     Q_OBJECT
 public:
@@ -54,7 +55,7 @@ public Q_SLOTS:
     void updateButtonIcons(bool);
 };
 
-class LoopButton : public QToolButton
+class QtVlcWidgets_EXPORT LoopButton : public QToolButton
 {
     Q_OBJECT
 public:
@@ -63,7 +64,7 @@ public Q_SLOTS:
     void updateButtonIcons(int);
 };
 
-class AtoB_Button : public QToolButton
+class QtVlcWidgets_EXPORT AtoB_Button : public QToolButton
 {
     Q_OBJECT
 public:
