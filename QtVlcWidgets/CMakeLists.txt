@@ -16,43 +16,100 @@
 # * along with this library. If not, see <http://www.gnu.org/licenses/>.
 # *****************************************************************************/
 
-SET(QtVlcWidgets_SOURCES
-VlcVideoWidget.cpp
-TimeLabel.cpp
-TimeTooltip.cpp
-SeekStyle.cpp
-SeekSlider.cpp
-SoundSlider.cpp
-SoundWidget.cpp
-SpecialButtons.cpp
+project(QtVlc_Widgets)
+
+#-----------------------------------------------------------------------------
+# Sources
+
+SET(SOURCES
+	VlcVideoWidget.cpp
+	TimeLabel.cpp
+	TimeTooltip.cpp
+	SeekStyle.cpp
+	SeekSlider.cpp
+	SoundSlider.cpp
+	SoundWidget.cpp
+	SpecialButtons.cpp
 )
 
-SET(QtVlcWidgets_HEADERS
-../include/QtVlcWidgets/config.h
-../include/QtVlcWidgets/const.h
-../include/QtVlcWidgets/VlcVideoWidget.h
-../include/QtVlcWidgets/TimeLabel.h
-../include/QtVlcWidgets/TimeTooltip.h
-../include/QtVlcWidgets/SeekSlider.h
-../include/QtVlcWidgets/SoundSlider.h
-../include/QtVlcWidgets/SoundWidget.h
-../include/QtVlcWidgets/SpecialButtons.h
+#-----------------------------------------------------------------------------
+# Private Headers
+
+SET(HEADERS
+	QtVlcWidgetsConfig.h
+	QtVlcWidgetsConst.h
+	VlcVideoWidget.h
+	TimeLabel.h
+	TimeTooltip.h
+	SeekSlider.h
+	SoundSlider.h
+	SoundWidget.h
+	SpecialButtons.h
 )
 
-SET(QtVlcWidgets_HEADERS_PRIVATE
-SeekStyle.h
+#-----------------------------------------------------------------------------
+# Public Headers
+
+SET(HEADERS_PRIVATE
+	SeekStyle.h
 )
 
-SET(QtVlcWidgets_RESOURCES
-../vlc/modules/gui/qt4/vlc.qrc
+#-----------------------------------------------------------------------------
+# Qt Resources
+
+SET(RESOURCES
+	../vlc/modules/gui/qt4/vlc.qrc
 )
 
-QT5_ADD_RESOURCES(QtVlcWidgets_RCC ${QtVlcWidgets_RESOURCES})
+#-----------------------------------------------------------------------------
+# Build the library
+
+include_directories(../QtVlc)
+
+QT5_ADD_RESOURCES(RCC ${RESOURCES})
 add_definitions(-DQtVlcWidgets_LIBRARY)
-add_library(QtVlcWidgets SHARED ${QtVlcWidgets_SOURCES} ${QtVlcWidgets_HEADERS} ${QtVlcWidgets_HEADERS_PRIVATE} ${QtVlcWidgets_RCC})
+add_library(QtVlcWidgets SHARED ${SOURCES} ${HEADERS} ${HEADERS_PRIVATE} ${RCC})
 QT5_USE_MODULES(QtVlcWidgets Core Gui Widgets)
-target_link_libraries(QtVlcWidgets ${QtVlc_LIBRARY})
+target_link_libraries(QtVlcWidgets QtVlc)
 
 GET_PROPERTY(QtVlcWidgets_LIBRARY TARGET QtVlcWidgets PROPERTY LOCATION)
 SET(QtVlcWidgets_LIBRARY ${QtVlcWidgets_LIBRARY} CACHE INTERNAL "")
 
+#-----------------------------------------------------------------------------
+# Install library (on windows, put the dll in 'bin' and the archive in 'lib')
+
+set_target_properties(QtVlcWidgets PROPERTIES PUBLIC_HEADER "${HEADERS}")
+
+install(TARGETS QtVlcWidgets EXPORT QtVlcWidgetsTargets COMPONENT Widgets
+				RUNTIME DESTINATION bin
+				LIBRARY DESTINATION lib
+				ARCHIVE DESTINATION lib
+				PUBLIC_HEADER DESTINATION include/QtVlcWidgets)
+
+#-----------------------------------------------------------------------------
+# Export CMake Config
+
+if(WIN32 AND NOT CYGWIN)
+	set(LIB_CMAKE_PATH "cmake")
+else()
+	set(LIB_CMAKE_PATH "lib/cmake/QtVlcWidgets")
+endif()
+
+export(TARGETS QtVlcWidgets QtVlc FILE "${PROJECT_BINARY_DIR}/QtVlcWidgetsTargets.cmake")
+export(PACKAGE QtVlcWidgets)
+
+# build tree
+set(EXPORT_LOCAL ON)
+set(INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(QtVlcWidgetsConfig.cmake.in "${PROJECT_BINARY_DIR}/QtVlcWidgetsConfig.cmake" @ONLY)
+# install tree
+set(EXPORT_LOCAL OFF)
+set(INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/QtVlcWidgets")
+configure_file(QtVlcWidgetsConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QtVlcWidgetsConfig.cmake" @ONLY)
+# both
+configure_file(QtVlcWidgetsConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/QtVlcWidgetsConfigVersion.cmake" @ONLY)
+
+install(EXPORT QtVlcWidgetsTargets DESTINATION "${LIB_CMAKE_PATH}" COMPONENT Widgets-dev)
+install(FILES ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QtVlcWidgetsConfig.cmake
+			  ${PROJECT_BINARY_DIR}/QtVlcWidgetsConfigVersion.cmake
+		DESTINATION "${LIB_CMAKE_PATH}" COMPONENT Widgets-dev)

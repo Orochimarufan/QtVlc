@@ -44,7 +44,7 @@
 #include <QtCore/QDebug>
 
 #include "SeekStyle.h"
-#include <QtVlcWidgets/SeekSlider.h>
+#include "SeekSlider.h"
 
 #define RADIUS 3
 #define CHAPTERSSPOTSIZE 3

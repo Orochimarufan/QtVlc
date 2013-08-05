@@ -18,12 +18,14 @@
 /* ATTENTION: this is GPL, not LGPL due to code from the VLC Qt Interface.
  * Original License: */
 /*****************************************************************************
- * controller_widget.hpp : Controller Widget for the controllers
+ * interface_widgets.hpp : Custom widgets for the main interface
  ****************************************************************************
  * Copyright (C) 2006-2008 the VideoLAN team
- * $Id: 48a6d96b098aa5594d75e8bbba3b3f143f90f101 $
+ * $Id: d4be935f82d11b2016afa897470dec1fe90013a6 $
  *
- * Authors: Jean-Baptiste Kempf <jb@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,37 +42,81 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QTVLC_WIDGETS_SPECIALBUTTONS_H
-#define QTVLC_WIDGETS_SPECIALBUTTONS_H
+#ifndef TIMELABEL_H
+#define TIMELABEL_H
 
-#include <QtWidgets/QToolButton>
-#include <QtVlcWidgets/config.h>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QLabel>
 
-class QtVlcWidgets_EXPORT PlayButton : public QToolButton
+#include "QtVlcWidgetsConfig.h"
+#include "QtVlcWidgetsConst.h"
+
+class QtVlcWidgets_EXPORT ClickableQLabel : public QLabel
+{
+    Q_OBJECT
+
+public:
+    explicit ClickableQLabel(QWidget *parent = 0) : QLabel(parent)
+    {}
+
+    virtual void mouseDoubleClickEvent(QMouseEvent *e)
+    {
+        Q_UNUSED(e);
+        emit doubleClicked();
+    }
+
+signals:
+    void doubleClicked();
+};
+
+class QtVlcWidgets_EXPORT TimeLabel : public ClickableQLabel
 {
     Q_OBJECT
 public:
-    PlayButton(QWidget *parent = 0) : QToolButton(parent) { updateButtonIcons(false); }
-public Q_SLOTS:
-    void updateButtonIcons(bool);
+    enum Display
+    {
+        Elapsed,
+        Remaining,
+        Both
+    };
+
+    TimeLabel(QWidget *parent = 0, TimeLabel::Display _displayType = TimeLabel::Both);
+
+protected:
+    virtual void mousePressEvent(QMouseEvent *event)
+    {
+        if(displayType == TimeLabel::Elapsed) return;
+        toggleTimeDisplay();
+        event->accept();
+    }
+    virtual void mouseDoubleClickEvent(QMouseEvent *event)
+    {
+        if(displayType != TimeLabel::Both) return;
+        event->accept();
+        toggleTimeDisplay();
+        ClickableQLabel::mouseDoubleClickEvent(event);
+    }
+
+private:
+    bool b_remainingTime;
+    int cachedLength;
+    QTimer *bufTimer;
+
+    bool buffering;
+    bool showBuffering;
+    float bufVal;
+    TimeLabel::Display displayType;
+
+    char psz_length[MSTRTIME_MAX_SIZE];
+    char psz_time[MSTRTIME_MAX_SIZE];
+    void toggleTimeDisplay();
+    void paintEvent(QPaintEvent*);
+
+public slots:
+    void setDisplayPosition(float pos, qint64 time, qint64 length);
+    void setDisplayPosition(float pos);
+    void updateBuffering(float);
+    void updateBuffering();
 };
 
-class QtVlcWidgets_EXPORT LoopButton : public QToolButton
-{
-    Q_OBJECT
-public:
-    LoopButton(QWidget *parent = 0) : QToolButton(parent) { updateButtonIcons(0); }
-public Q_SLOTS:
-    void updateButtonIcons(int);
-};
-
-class QtVlcWidgets_EXPORT AtoB_Button : public QToolButton
-{
-    Q_OBJECT
-public:
-    AtoB_Button(QWidget *parent = 0) : QToolButton(parent) {}
-public Q_SLOTS:
-    void updateButtonIcons(bool, bool);
-};
-
-#endif // QTVLC_WIDGETS_SPECIALBUTTONS_H
+#endif // TIMELABEL_H

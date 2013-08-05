@@ -48,8 +48,8 @@
 #include <QtWidgets/QAbstractSlider>
 #include <QtGui/QPainter>
 
-#include <QtVlcWidgets/config.h>
-#include <QtVlcWidgets/const.h>
+#include "QtVlcWidgetsConfig.h"
+#include "QtVlcWidgetsConst.h"
 
 /* Sound Slider inherited directly from QAbstractSlider */
 class QtVlcWidgets_EXPORT SoundSlider : public QAbstractSlider

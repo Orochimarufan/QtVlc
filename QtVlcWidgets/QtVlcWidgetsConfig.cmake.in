@@ -1,0 +1,25 @@
+# - Config file for the QtVlcWidgets package
+# It defines the following variables
+#  QtVlcWidgets_INCLUDE_DIRS - include directories for QtVlcWidgets
+#  QtVlcWidgets_LIBRARIES    - libraries to link against
+
+set(__EXPORT_LOCAL @EXPORT_LOCAL@)
+if(NOT __EXPORT_LOCAL)
+	find_package(QtVlc)
+endif()
+
+# Compute paths
+get_filename_component(__CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(QtVlcWidgets_INCLUDE_DIRS "@INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET QtVlcWidgets)
+  include("${__CMAKE_DIR}/QtVlcWidgetsTargets.cmake")
+endif()
+
+if(__EXPORT_LOCAL)
+	find_package(QtVlc)
+endif()
+
+# These are IMPORTED targets created by QtVlcWidgetsTargets.cmake
+set(QtVlcWidgets_LIBRARIES QtVlcWidgets)

@@ -40,9 +40,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QtVlcWidgets/SoundWidget.h>
-#include <QtVlcWidgets/SoundSlider.h>
-#include <QtVlcWidgets/const.h>
+#include "SoundWidget.h"
+#include "SoundSlider.h"
+#include "QtVlcWidgetsConst.h"
 
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QWidgetAction>

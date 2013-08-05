@@ -22,7 +22,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
 
-#include <QtVlc/config.h>
+#include "QtVlcConfig.h"
 
 struct libvlc_instance_t;
 class VlcInstancePrivate;

@@ -22,7 +22,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
-#include <QtVlc/config.h>
+#include "QtVlcConfig.h"
 
 struct libvlc_media_player_t;
 class VlcMediaPlayer;

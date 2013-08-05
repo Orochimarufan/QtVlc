@@ -22,8 +22,8 @@
 #include <QtCore/QObject>
 #include <QtGui/qwindowdefs.h>
 
-#include <QtVlc/config.h>
-#include <QtVlc/enum.h>
+#include "QtVlcConfig.h"
+#include "VlcEnum.h"
 
 
 struct libvlc_event_t;

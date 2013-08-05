@@ -18,12 +18,11 @@
 
 #include <vlc/vlc.h>
 
-#include <QtVlc/config.h>
-#include <QtVlc/enum.h>
-#include <QtVlc/VlcInstance.h>
+#include "QtVlcConfig.h"
+#include "VlcEnum.h"
+#include "VlcError.h"
+#include "VlcInstance.h"
 #include "VlcInstance_p.h"
-
-#include <QtVlc/error.h>
 
 bool VlcInstance::isValid()
 {

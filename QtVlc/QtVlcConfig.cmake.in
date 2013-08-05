@@ -1,0 +1,16 @@
+# - Config file for the QtVlc package
+# It defines the following variables
+#  QtVlc_INCLUDE_DIRS - include directories for QtVlc
+#  QtVlc_LIBRARIES    - libraries to link against
+
+# Compute paths
+get_filename_component(QTVLC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(QtVlc_INCLUDE_DIRS "@INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET QtVlc)
+  include("${QTVLC_CMAKE_DIR}/QtVlcTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by @PythonQt@Targets.cmake
+set(QtVlc_LIBRARIES QtVlc)

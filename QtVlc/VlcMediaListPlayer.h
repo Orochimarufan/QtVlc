@@ -19,7 +19,8 @@
 #ifndef QTVLC_VLCMEDIALISTPLAYER_H
 #define QTVLC_VLCMEDIALISTPLAYER_H
 
-#include <QtVlc/AbstractMediaListPlayer.h>
+#include "AbstractMediaListPlayer.h"
+#include "VlcMedia.h"
 
 class VlcInstance;
 struct libvlc_instance_t;

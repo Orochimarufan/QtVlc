@@ -18,9 +18,9 @@
 
 #include <vlc/vlc.h>
 
-#include <QtVlc/VlcMediaPlayerAudio.h>
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/error.h>
+#include "VlcMediaPlayerAudio.h"
+#include "VlcMediaPlayer.h"
+#include "VlcError.h"
 
 #include "VlcMediaPlayer_p.h"
 

@@ -55,7 +55,7 @@
 
 #include <cassert>
 
-#include "QtVlcWidgets/VlcVideoWidget.h"
+#include "VlcVideoWidget.h"
 
 
 VlcVideoWidget::VlcVideoWidget(QWidget *parent, QWidget *dw) :

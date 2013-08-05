@@ -18,9 +18,9 @@
 
 #include <QtCore/QUrl>
 
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMedia.h>
-#include <QtVlc/error.h>
+#include "VlcInstance.h"
+#include "VlcMedia.h"
+#include "VlcError.h"
 #include "VlcMedia_p.h"
 
 // signals

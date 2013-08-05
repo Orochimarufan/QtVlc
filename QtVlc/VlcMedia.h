@@ -21,8 +21,8 @@
 
 #include <QtCore/QObject>
 
-#include <QtVlc/config.h>
-#include <QtVlc/enum.h>
+#include "QtVlcConfig.h"
+#include "VlcEnum.h"
 
 struct libvlc_instance_t;
 struct libvlc_media_t;

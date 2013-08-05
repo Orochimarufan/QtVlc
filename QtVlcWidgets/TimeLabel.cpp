@@ -47,9 +47,9 @@
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
-#include <QtVlcWidgets/TimeLabel.h>
+#include "TimeLabel.h"
 
-#include "util.h"
+#include "QtVlcWidgetsUtil.h"
 
 #include <cstdio>
 

@@ -47,9 +47,9 @@
 
 #include <QtWidgets/QSlider>
 
-#include <QtVlcWidgets/config.h>
-#include <QtVlcWidgets/const.h>
-#include <QtVlcWidgets/TimeTooltip.h>
+#include "QtVlcWidgetsConfig.h"
+#include "QtVlcWidgetsConst.h"
+#include "TimeTooltip.h"
 
 class QMouseEvent;
 class QWheelEvent;

@@ -38,6 +38,8 @@ mainwindow.ui
 
 QT5_WRAP_UI(DemoApp_UI_HEADERS ${DemoApp_UI})
 
+include_directories(../QtVlc ../QtVlcWidgets)
+
 add_executable(QtVlcDemo ${DemoApp_SOURCES} ${DemoApp_HEADERS} ${DemoApp_UI_HEADERS})
 qt5_use_modules(QtVlcDemo Core Widgets)
-target_link_libraries(QtVlcDemo ${QtVlc_LIBRARY} ${QtVlcWidgets_LIBRARY})
+target_link_libraries(QtVlcDemo QtVlc QtVlcWidgets)

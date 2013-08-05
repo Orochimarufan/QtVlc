@@ -361,13 +361,7 @@ QHash<int, QString> VlcMediaPlayerPrivate::audio_trackDescription() const
     if (d)
     {
         libvlc_track_description_t *desc = libvlc_audio_get_track_description(d);
-
-        descriptions[desc->i_id] = QString::fromUtf8(desc->psz_name);
-        for (int i = 1; i < audio_trackCount(); i++)
-        {
-            desc = desc->p_next;
-            descriptions[desc->i_id] = QString::fromUtf8(desc->psz_name);
-        }
+        descriptions = track_description(desc);
     }
 
     return descriptions;
@@ -377,4 +371,200 @@ void VlcMediaPlayerPrivate::audio_setTrack(const int &track)
 {
     if (d)
         libvlc_audio_set_track(d, track);
+}
+
+// video
+void VlcMediaPlayerPrivate::video_setKeyInput(bool on)
+{
+    libvlc_video_set_key_input(d, on);
+}
+
+void VlcMediaPlayerPrivate::video_setMouseInput(bool on)
+{
+    libvlc_video_set_mouse_input(d, on);
+}
+
+bool VlcMediaPlayerPrivate::video_getSize(unsigned num, unsigned *x, unsigned *y) const
+{
+    return libvlc_video_get_size(d, num, x, y) == 0;
+}
+
+bool VlcMediaPlayerPrivate::video_getCursor(unsigned num, int *x, int *y) const
+{
+    return libvlc_video_get_cursor(d, num, x, y) == 0;
+}
+
+float VlcMediaPlayerPrivate::video_scale() const
+{
+    return libvlc_video_get_scale(d);
+}
+
+void VlcMediaPlayerPrivate::video_setScale(float factor)
+{
+    libvlc_video_set_scale(d, factor);
+}
+
+QString VlcMediaPlayerPrivate::video_aspectRatio() const
+{
+    return qstring_and_free(libvlc_video_get_aspect_ratio(d));
+}
+
+void VlcMediaPlayerPrivate::video_setAspectRatio(const QString &ratio)
+{
+    libvlc_video_set_aspect_ratio(d, ratio.toUtf8().constData());
+}
+
+int VlcMediaPlayerPrivate::video_spu() const
+{
+    return libvlc_video_get_spu(d);
+}
+
+int VlcMediaPlayerPrivate::video_spuCount() const
+{
+    return libvlc_video_get_spu_count(d);
+}
+
+QHash<int, QString> VlcMediaPlayerPrivate::video_spuDescription() const
+{
+    return track_description(libvlc_video_get_spu_description(d));
+}
+
+bool VlcMediaPlayerPrivate::video_setSpu(int spu)
+{
+    return libvlc_video_set_spu(d, spu) == 0;
+}
+
+bool VlcMediaPlayerPrivate::video_setSubtitleFile(const QString &filename)
+{
+    return libvlc_video_set_subtitle_file(d, filename.toUtf8().constData());
+}
+
+qint64 VlcMediaPlayerPrivate::video_spuDelay() const
+{
+    return libvlc_video_get_spu_delay(d);
+}
+
+bool VlcMediaPlayerPrivate::video_setSpuDelay(qint64 delay)
+{
+    return libvlc_video_set_spu_delay(d, delay) == 0;
+}
+
+QHash<int, QString> VlcMediaPlayerPrivate::video_titleDescription() const
+{
+    return track_description(libvlc_video_get_title_description(d));
+}
+
+QHash<int, QString> VlcMediaPlayerPrivate::video_chapterDescription(int title) const
+{
+    return track_description(libvlc_video_get_chapter_description(d, title));
+}
+
+QString VlcMediaPlayerPrivate::video_cropGeometry() const
+{
+    return QString::fromUtf8(libvlc_video_get_crop_geometry(d));
+}
+
+void VlcMediaPlayerPrivate::video_setCropGeometry(const QString &geometry)
+{
+    libvlc_video_set_crop_geometry(d, geometry.toUtf8().constData());
+}
+
+int VlcMediaPlayerPrivate::video_teletext() const
+{
+    return libvlc_video_get_teletext(d);
+}
+
+void VlcMediaPlayerPrivate::video_setTeletext(int page)
+{
+    libvlc_video_set_teletext(d, page);
+}
+
+void VlcMediaPlayerPrivate::video_toggleTeletext()
+{
+    libvlc_toggle_teletext(d);
+}
+
+int VlcMediaPlayerPrivate::video_trackCount() const
+{
+    return libvlc_video_get_track_count(d);
+}
+
+int VlcMediaPlayerPrivate::video_track() const
+{
+    return libvlc_video_get_track(d);
+}
+
+QHash<int, QString> VlcMediaPlayerPrivate::video_trackDescription() const
+{
+    return track_description(libvlc_video_get_track_description(d));
+}
+
+bool VlcMediaPlayerPrivate::video_setTrack(int track)
+{
+    return libvlc_video_set_track(d, track) == 0;
+}
+
+bool VlcMediaPlayerPrivate::video_takeSnapshot(unsigned num, const QString &filename, unsigned int width, unsigned int height) const
+{
+    return libvlc_video_take_snapshot(d, num, filename.toUtf8().constData(), width, height) == 0;
+}
+
+void VlcMediaPlayerPrivate::video_setDeinterlace(const QString &mode)
+{
+    libvlc_video_set_deinterlace(d, mode.toUtf8().constData());
+}
+
+int VlcMediaPlayerPrivate::video_marqueeInt(unsigned option) const
+{
+    return libvlc_video_get_marquee_int(d, option);
+}
+
+QString VlcMediaPlayerPrivate::video_marqueeString(unsigned option) const
+{
+    return QString::fromUtf8(libvlc_video_get_marquee_string(d, option));
+}
+
+void VlcMediaPlayerPrivate::video_setMarqueeInt(unsigned option, int value)
+{
+    libvlc_video_set_marquee_int(d, option, value);
+}
+
+void VlcMediaPlayerPrivate::video_setMarqueeString(unsigned option, const QString &text)
+{
+    libvlc_video_set_marquee_string(d, option, text.toUtf8().constData());
+}
+
+int VlcMediaPlayerPrivate::video_logoInt(unsigned option) const
+{
+    return libvlc_video_get_logo_int(d, option);
+}
+
+void VlcMediaPlayerPrivate::video_setLogoInt(unsigned option, int value)
+{
+    libvlc_video_set_logo_int(d, option, value);
+}
+
+void VlcMediaPlayerPrivate::video_setLogoString(unsigned option, const QString &value)
+{
+    libvlc_video_set_logo_string(d, option, value.toUtf8().constData());
+}
+
+int VlcMediaPlayerPrivate::video_adjustInt(unsigned option) const
+{
+    return libvlc_video_get_adjust_int(d, option);
+}
+
+float VlcMediaPlayerPrivate::video_adjustFloat(unsigned option) const
+{
+    return libvlc_video_get_adjust_float(d, option);
+}
+
+void VlcMediaPlayerPrivate::video_setAdjustInt(unsigned option, int value)
+{
+    libvlc_video_set_adjust_int(d, option, value);
+}
+
+void VlcMediaPlayerPrivate::video_setAdjustFloat(unsigned option, float value)
+{
+    libvlc_video_set_adjust_float(d, option, value);
 }

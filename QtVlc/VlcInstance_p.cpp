@@ -20,7 +20,7 @@
 
 #include <QStringList>
 
-#include <QtVlc/enum.h>
+#include "VlcEnum.h"
 
 VLC_WRAPPER_IMPL_CPP(VlcInstancePrivate, libvlc_instance_t, libvlc)
 
@@ -29,15 +29,19 @@ VlcInstancePrivate *VlcInstancePrivate::global = nullptr;
 VlcInstancePrivate::VlcInstancePrivate(const QStringList &args) :
     VlcWrapperImpl(), d(nullptr)
 {
-
     qRegisterMetaType<VlcState::Type>("VlcState::Type");
     qRegisterMetaType<VlcMeta::Type>("VlcMeta::Type");
 
-    char **argv = (char **)malloc(sizeof(char **) * args.count());
+    char **argv = (char **)malloc(sizeof(char **) * (args.count()+1));
+
+    // We need to pass -Idummy so we have a *chance* that
+    // VLC doesn't try to load the Qt4 plugin.
+    argv[args.count()] = (char *)"-Idummy";
+
     for (int i = 0; i < args.count(); i++)
         argv[i] = (char *)qstrdup(args.at(i).toLocal8Bit().data());
 
-    d = libvlc_new(args.count(), argv);
+    d = libvlc_new(args.count()+1, argv);
 
     if (d)
         qDebug("Initialized libvlc.");

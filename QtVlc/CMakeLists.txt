@@ -16,53 +16,66 @@
 # * along with this library. If not, see <http://www.gnu.org/licenses/>.
 # *****************************************************************************/
 
-SET(QtVlc_SOURCES
-common_p.cpp
-error.cpp
-VlcInstance.cpp
-VlcInstance_p.cpp
-VlcMedia.cpp
-VlcMedia_p.cpp
-VlcMediaPlayer.cpp
-VlcMediaPlayer_p.cpp
-VlcMediaPlayerAudio.cpp
-#VlcMediaPlayerVideo.cpp
-AbstractMediaList.cpp
-VlcMediaList.cpp
-VlcMediaList_p.cpp
-AbstractMediaListPlayer.cpp
-VlcMediaListPlayer.cpp
-VlcMediaListPlayer_p.cpp
+project(QtVlc_Core)
+
+#-----------------------------------------------------------------------------
+# Sources
+
+SET(SOURCES
+	common_p.cpp
+	VlcError.cpp
+	VlcInstance.cpp
+	VlcInstance_p.cpp
+	VlcMedia.cpp
+	VlcMedia_p.cpp
+	VlcMediaPlayer.cpp
+	VlcMediaPlayer_p.cpp
+	VlcMediaPlayerAudio.cpp
+	VlcMediaPlayerVideo.cpp
+	AbstractMediaList.cpp
+	VlcMediaList.cpp
+	VlcMediaList_p.cpp
+	AbstractMediaListPlayer.cpp
+	VlcMediaListPlayer.cpp
+	VlcMediaListPlayer_p.cpp
 )
 
-SET(QtVlc_HEADERS_PRIVATE
-common_p.h
-VlcInstance_p.h
-VlcMedia_p.h
-VlcMediaPlayer_p.h
-VlcMediaList_p.h
-VlcMediaListPlayer_p.h
+#-----------------------------------------------------------------------------
+# Private Headers
+
+SET(HEADERS_PRIVATE
+	common_p.h
+	VlcInstance_p.h
+	VlcMedia_p.h
+	VlcMediaPlayer_p.h
+	VlcMediaList_p.h
+	VlcMediaListPlayer_p.h
 )
 
-SET(QtVlc_HEADERS
-../include/QtVlc/config.h
-../include/QtVlc/enum.h
-../include/QtVlc/error.h
-../include/QtVlc/VlcInstance.h
-../include/QtVlc/VlcMedia.h
-../include/QtVlc/VlcMediaPlayer.h
-../include/QtVlc/IVlcVideoDelegate.h
-../include/QtVlc/VlcMediaPlayerAudio.h
-#../include/QtVlc/VlcMediaPlayerVideo.h
-../include/QtVlc/AbstractMediaList.h
-../include/QtVlc/VlcMediaList.h
-../include/QtVlc/AbstractMediaListPlayer.h
-../include/QtVlc/VlcMediaListPlayer.h
+#-----------------------------------------------------------------------------
+# Public Headers
+
+SET(HEADERS
+	QtVlcConfig.h
+	VlcEnum.h
+	VlcError.h
+	VlcInstance.h
+	VlcMedia.h
+	VlcMediaPlayer.h
+	IVlcVideoDelegate.h
+	VlcMediaPlayerAudio.h
+	VlcMediaPlayerVideo.h
+	AbstractMediaList.h
+	VlcMediaList.h
+	AbstractMediaListPlayer.h
+	VlcMediaListPlayer.h
 )
 
+#-----------------------------------------------------------------------------
+# Build the library
 
 add_definitions(-DQtVlc_LIBRARY)
-add_library(QtVlc SHARED ${QtVlc_SOURCES} ${QtVlc_HEADERS} ${QtVlc_HEADERS_PRIVATE})
+add_library(QtVlc SHARED ${SOURCES} ${HEADERS} ${HEADERS_PRIVATE})
 QT5_USE_MODULES(QtVlc Core)
 #target_link_libraries(QtVlc ${LIBVLC_LIBRARIES} ${LIBVLCCORE_LIBRARIES})
 target_link_libraries(QtVlc ${LIBVLC_LIBRARIES})
@@ -73,4 +86,42 @@ ENDIF(BUILD_VLC)
 
 GET_PROPERTY(QtVlc_LIBRARY TARGET QtVlc PROPERTY LOCATION)
 SET(QtVlc_LIBRARY ${QtVlc_LIBRARY} CACHE INTERNAL "")
+
+#-----------------------------------------------------------------------------
+# Install library (on windows, put the dll in 'bin' and the archive in 'lib')
+
+set_target_properties(QtVlc PROPERTIES PUBLIC_HEADER "${HEADERS}")
+
+install(TARGETS QtVlc EXPORT QtVlcTargets COMPONENT core-dev
+				RUNTIME DESTINATION bin COMPONENT core
+				LIBRARY DESTINATION lib COMPONENT core
+				ARCHIVE DESTINATION lib COMPONENT core
+				PUBLIC_HEADER DESTINATION include/QtVlc)
+
+#-----------------------------------------------------------------------------
+# Export CMake Config
+
+if(WIN32 AND NOT CYGWIN)
+	set(LIB_CMAKE_PATH "cmake")
+else()
+	set(LIB_CMAKE_PATH "lib/cmake/QtVlc")
+endif()
+
+export(TARGETS QtVlc FILE "${PROJECT_BINARY_DIR}/QtVlcTargets.cmake")
+export(PACKAGE QtVlc)
+
+# build tree
+set(INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(QtVlcConfig.cmake.in "${PROJECT_BINARY_DIR}/QtVlcConfig.cmake" @ONLY)
+# install tree
+set(INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/QtVlc")
+configure_file(QtVlcConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QtVlcConfig.cmake" @ONLY)
+# both
+configure_file(QtVlcConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/QtVlcConfigVersion.cmake" @ONLY)
+
+install(EXPORT QtVlcTargets DESTINATION "${LIB_CMAKE_PATH}" COMPONENT core-dev)
+install(FILES ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/QtVlcConfig.cmake
+			  ${PROJECT_BINARY_DIR}/QtVlcConfigVersion.cmake
+		DESTINATION "${LIB_CMAKE_PATH}" COMPONENT core-dev)
+
 

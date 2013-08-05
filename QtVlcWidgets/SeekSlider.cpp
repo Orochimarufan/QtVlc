@@ -57,10 +57,10 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtWidgets/QApplication>
 
-#include <QtVlcWidgets/SeekSlider.h>
+#include "SeekSlider.h"
 
 #include "SeekStyle.h"
-#include "util.h"
+#include "QtVlcWidgetsUtil.h"
 
 SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
           : QSlider( q, _parent ), b_classic( _static )

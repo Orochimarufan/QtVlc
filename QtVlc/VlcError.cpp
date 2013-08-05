@@ -18,7 +18,8 @@
 
 #include <vlc/vlc.h>
 
-#include <QtVlc/error.h>
+#include "VlcError.h"
+
 #include <cstring>
 
 VlcError::VlcError() noexcept :

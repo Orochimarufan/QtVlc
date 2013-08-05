@@ -16,8 +16,8 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtVlc/AbstractMediaList.h>
-#include <QtVlc/VlcMedia.h>
+#include "AbstractMediaList.h"
+#include "VlcMedia.h"
 
 AbstractMediaList::~AbstractMediaList()
 {}

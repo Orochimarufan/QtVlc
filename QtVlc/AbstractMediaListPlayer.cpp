@@ -1,4 +1,4 @@
-#include <QtVlc/AbstractMediaListPlayer.h>
+#include "AbstractMediaListPlayer.h"
 
 AbstractMediaListPlayer::~AbstractMediaListPlayer()
 {}

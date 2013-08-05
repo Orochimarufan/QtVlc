@@ -17,11 +17,11 @@
  *****************************************************************************/
 
 #include <QtWidgets/QApplication>
-#include <QtVlc/VlcInstance.h>
-
-#include <iostream>
+#include "VlcInstance.h"
 
 #include "mainwindow.h"
+
+#include <iostream>
 
 int main(int argc, char** argv)
 {

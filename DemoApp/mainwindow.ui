@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>24</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -129,29 +129,29 @@
   <customwidget>
    <class>VlcVideoWidget</class>
    <extends>QFrame</extends>
-   <header location="global">QtVlcWidgets/VlcVideoWidget.h</header>
+   <header location="global">VlcVideoWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>TimeLabel</class>
    <extends>QLabel</extends>
-   <header location="global">QtVlcWidgets/TimeLabel.h</header>
+   <header location="global">TimeLabel.h</header>
   </customwidget>
   <customwidget>
    <class>SeekSlider</class>
    <extends>QSlider</extends>
-   <header location="global">QtVlcWidgets/SeekSlider.h</header>
+   <header location="global">SeekSlider.h</header>
   </customwidget>
   <customwidget>
    <class>SoundWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QtVlcWidgets/SoundWidget.h</header>
+   <header location="global">SoundWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>PlayButton</class>
    <extends>QToolButton</extends>
-   <header location="global">QtVlcWidgets/SpecialButtons.h</header>
+   <header location="global">SpecialButtons.h</header>
   </customwidget>
  </customwidgets>
  <resources>

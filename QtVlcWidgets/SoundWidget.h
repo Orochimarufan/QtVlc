@@ -17,11 +17,13 @@
  *****************************************************************************/
 /* ATTENTION: this is GPL, not LGPL due to code from the VLC Qt Interface.
  * Original License: */
- /*****************************************************************************
- * Copyright © 2011 VideoLAN
- * $Id$
+/*****************************************************************************
+ * controller_widget.hpp : Controller Widget for the controllers
+ ****************************************************************************
+ * Copyright (C) 2006-2008 the VideoLAN team
+ * $Id: 48a6d96b098aa5594d75e8bbba3b3f143f90f101 $
  *
- * Authors: Ludovic Fauvet <etix@l0cal.com>
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,48 +36,55 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef QTVLC_WIDGETS_TIMETOOLTIP_H
-#define QTVLC_WIDGETS_TIMETOOLTIP_H
+#ifndef QTVLC_WIDGETS_SOUNDWIDGET_H
+#define QTVLC_WIDGETS_SOUNDWIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <QtGui/QBitmap>
+#include "QtVlcWidgetsConfig.h"
 
-#include <QtVlcWidgets/config.h>
+class QLabel;
+class QAbstractSlider;
+class QFrame;
+class QMenu;
 
-class QPaintEvent;
-class QString;
-class QFont;
-class QRect;
-class QPainterPath;
-
-class QtVlcWidgets_EXPORT TimeTooltip : public QWidget
+class QtVlcWidgets_EXPORT SoundWidget : public QWidget
 {
     Q_OBJECT
+
 public:
-    explicit TimeTooltip( QWidget *parent = 0 );
-    void setTip( const QPoint& pos, const QString& time, const QString& text );
-    virtual void show();
+    SoundWidget(QWidget *parent, bool b_fancy = true, bool b_special = false);
+    virtual ~SoundWidget();
+    void setMuted(bool);
 
 protected:
-    virtual void paintEvent( QPaintEvent * );
+    virtual bool eventFilter(QObject *obj, QEvent *e);
 
 private:
-    void adjustPosition();
-    void buildPath();
-    QPoint mTarget;
-    QString mTime;
-    QString mText;
-    QString mDisplayedText;
-    QFont mFont;
-    QRect mBox;
-    QPainterPath mPainterPath;
-    QBitmap mMask;
-    int mTipX;
-    bool mInitialized;
+    QLabel              *volMuteLabel;
+    QAbstractSlider     *volumeSlider;
+    QFrame              *volumeControlWidget;
+    QMenu               *volumeMenu;
+
+    bool                b_is_muted;
+    bool                b_ignore_valuechanged;
+
+public Q_SLOTS:
+    void updateVolume(int);
+
+protected Q_SLOTS:
+    void userUpdateVolume(int);
+    void updateMuteStatus(bool);
+    void refreshLabels(void);
+    void showVolumeMenu(QPoint pos);
+    void valueChangedFilter(int);
+
+Q_SIGNALS:
+    void volumeChanged(int);
+    void muteChanged(bool);
 };
 
-#endif // QTVLC_WIDGETS_TIMETOOLTIP_H
+#endif // QTVLC_WIDGETS_SOUNDWIDGET_H

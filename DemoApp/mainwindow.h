@@ -19,13 +19,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/VlcMediaPlayerAudio.h>
-#include <QtVlc/VlcMedia.h>
-
+#include <VlcMedia.h>
+#include <VlcMediaPlayer.h>
+#include <VlcMediaPlayerAudio.h>
+#include <VlcMediaPlayerVideo.h>
 
 namespace Ui {
 class MainWindow;

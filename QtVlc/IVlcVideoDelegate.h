@@ -16,44 +16,23 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef QTVLC_ERROR_H
-#define QTVLC_ERROR_H
+#ifndef QTVLC_IVLCVIDEODELEGATE_H
+#define QTVLC_IVLCVIDEODELEGATE_H
 
-#include <QtVlc/config.h>
+#include "QtVlcConfig.h"
 
-#include <exception>
 
-class QtVlc_EXPORT NullPointer : public std::exception
-{
-    virtual const char *what() const noexcept
-    {
-        return "Tried to work with a Vlc object that points nowhere.";
-    }
-};
-
-class QtVlc_EXPORT VlcError : public std::exception
+/**
+ * @brief The IVlcVideoDelegate class
+ * A interface to be provided by Video Vidgets
+ */
+class QtVlc_EXPORT IVlcVideoDelegate
 {
 public:
-    static VlcError *create() noexcept;
-    static VlcError *createNoClear() noexcept;
-    virtual const char *what() const noexcept;
-    ~VlcError() noexcept;
+    virtual ~IVlcVideoDelegate() {}
 
-private:
-    const char *reason;
-    VlcError() noexcept;
+    virtual WId request(bool b_keep_size = true, unsigned int i_width = 0,  unsigned int i_height = 0) = 0;
+    virtual void release() = 0;
 };
 
-#ifndef NO_NULL_CHECK
-#   define CHECKNP if (d == nullptr) throw new NullPointer();
-#else
-#   define CHECKNP
-#endif
-
-#ifndef NO_VLC_ERROR_CHECK
-#   define CHECKERR if (libvlc_errmsg()) throw VlcError::create();
-#else
-#   define CHECKERR
-#endif
-
-#endif // QTVLC_ERROR_H
+#endif // QTVLC_IVLCVIDEODELEGATE_H

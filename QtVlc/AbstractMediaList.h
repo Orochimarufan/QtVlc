@@ -21,7 +21,7 @@
 
 #include <QtCore/QObject>
 
-#include <QtVlc/config.h>
+#include "QtVlcConfig.h"
 
 class VlcMedia;
 

@@ -19,8 +19,8 @@
 #ifndef QTVLC_VLCMEDIALIST_H
 #define QTVLC_VLCMEDIALIST_H
 
-#include <QtVlc/config.h>
-#include <QtVlc/AbstractMediaList.h>
+#include "QtVlcConfig.h"
+#include "AbstractMediaList.h"
 
 class VlcInstance;
 class VlcMediaListPrivate;

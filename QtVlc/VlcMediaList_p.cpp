@@ -1,6 +1,6 @@
 #include "VlcMediaList_p.h"
 
-#include <QtVlc/VlcMedia.h>
+#include "VlcMedia.h"
 
 VLC_WRAPPER_IMPL_CPP2(VlcMediaListPrivate, libvlc_media_list_t,
                       libvlc_media_list, attach_events, detach_events)

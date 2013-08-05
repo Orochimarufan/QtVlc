@@ -46,9 +46,9 @@
 #define QTVLC_WIDGETS_VLCVIDEOWIDGET_H
 
 #include <QtWidgets/QFrame>
-#include <QtVlc/IVlcVideoDelegate.h>
+#include <IVlcVideoDelegate.h>
 
-#include <QtVlcWidgets/config.h>
+#include "QtVlcWidgetsConfig.h"
 
 /**
  * @brief The VlcVideoWidget class

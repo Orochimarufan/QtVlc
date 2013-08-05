@@ -16,23 +16,39 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef QTVLC_IVLCVIDEODELEGATE_H
-#define QTVLC_IVLCVIDEODELEGATE_H
+#ifndef QTVLC_ABSTRACTMEDIALISTPLAYER_H
+#define QTVLC_ABSTRACTMEDIALISTPLAYER_H
 
-#include <QtVlc/config.h>
+#include <QtCore/QObject>
 
+#include "VlcEnum.h"
 
-/**
- * @brief The IVlcVideoDelegate class
- * A interface to be provided by Video Vidgets
- */
-class QtVlc_EXPORT IVlcVideoDelegate
+class VlcMediaPlayer;
+class AbstractMediaList;
+class VlcMedia;
+
+class AbstractMediaListPlayer : public QObject
 {
+    Q_OBJECT
 public:
-    virtual ~IVlcVideoDelegate() {}
+    virtual ~AbstractMediaListPlayer();
 
-    virtual WId request(bool b_keep_size = true, unsigned int i_width = 0,  unsigned int i_height = 0) = 0;
-    virtual void release() = 0;
+    // ***** Virtual *****
+    virtual void setMediaPlayer(const VlcMediaPlayer &player) = 0;
+    virtual void setMediaList(const AbstractMediaList &list) = 0;
+
+    virtual bool isPlaying() = 0;
+    virtual VlcState::Type state() = 0;
+
+public Q_SLOTS:
+    virtual void play() = 0;
+    virtual void play(const VlcMedia &media) = 0;
+    virtual void play(int index) = 0;
+    virtual void pause() = 0;
+    virtual void stop() = 0;
+    virtual void next() = 0;
+    virtual void previous() = 0;
+    virtual void setPlaybackMode(const VlcPlaybackMode::Type &mode) = 0;
 };
 
-#endif // QTVLC_IVLCVIDEODELEGATE_H
+#endif // QTVLC_ABSTRACTMEDIALISTPLAYER_H

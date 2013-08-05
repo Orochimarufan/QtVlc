@@ -48,7 +48,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 
-#include <QtVlcWidgets/SoundSlider.h>
+#include "SoundSlider.h"
 
 /* This work is derived from Amarok's work under GPLv2+
     - Mark Kretschmann

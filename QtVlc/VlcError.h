@@ -16,23 +16,44 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef QTVLC_VLCMEDIAPLAYERVIDEO_H
-#define QTVLC_VLCMEDIAPLAYERVIDEO_H
+#ifndef QTVLC_ERROR_H
+#define QTVLC_ERROR_H
 
-#include <QtCore/QObject>
-#include <QtVlc/config.h>
+#include "QtVlcConfig.h"
 
-class VlcMediaPlayer;
+#include <exception>
 
-class QtVlc_EXPORT VlcMediaPlayerVideo : public QObject
+class QtVlc_EXPORT NullPointer : public std::exception
 {
-    Q_OBJECT
-private:
-    VlcMediaPlayer *player;
-
-    VlcMediaPlayerVideo(VlcMediaPlayer *player);
-
-    friend class VlcMediaPlayer;
+    virtual const char *what() const noexcept
+    {
+        return "Tried to work with a Vlc object that points nowhere.";
+    }
 };
 
-#endif // QTVLC_VLCMEDIAPLAYERVIDEO_H
+class QtVlc_EXPORT VlcError : public std::exception
+{
+public:
+    static VlcError *create() noexcept;
+    static VlcError *createNoClear() noexcept;
+    virtual const char *what() const noexcept;
+    ~VlcError() noexcept;
+
+private:
+    const char *reason;
+    VlcError() noexcept;
+};
+
+#ifndef NO_NULL_CHECK
+#   define CHECKNP if (d == nullptr) throw new NullPointer();
+#else
+#   define CHECKNP
+#endif
+
+#ifndef NO_VLC_ERROR_CHECK
+#   define CHECKERR if (libvlc_errmsg()) throw VlcError::create();
+#else
+#   define CHECKERR
+#endif
+
+#endif // QTVLC_ERROR_H

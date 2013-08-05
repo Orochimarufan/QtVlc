@@ -21,7 +21,7 @@
 
 #include <vlc/vlc.h>
 
-#include <QtVlc/enum.h>
+#include "VlcEnum.h"
 
 #include "common_p.h"
 

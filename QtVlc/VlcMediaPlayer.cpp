@@ -16,11 +16,11 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include <QtVlc/VlcMediaPlayer.h>
-#include <QtVlc/VlcMediaPlayerAudio.h>
-#include <QtVlc/VlcInstance.h>
-#include <QtVlc/VlcMedia.h>
-#include <QtVlc/error.h>
+#include "VlcMediaPlayer.h"
+#include "VlcMediaPlayerAudio.h"
+#include "VlcInstance.h"
+#include "VlcMedia.h"
+#include "VlcError.h"
 
 #include "VlcMediaPlayer_p.h"
 

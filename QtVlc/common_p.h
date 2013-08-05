@@ -118,4 +118,33 @@ inline T *getref(const T &in)
 
 #define D if (d)
 
+inline QString qstring_and_free(char *buf)
+{
+    if (!buf)
+        return QString::null;
+    QString a(buf);
+    free(buf);
+    return a;
+}
+
+#include <vlc/vlc.h>
+#include <QtCore/QHash>
+
+inline QHash<int, QString> track_description(libvlc_track_description_t *desc)
+{
+    QHash<int, QString> descriptions;
+
+    libvlc_track_description_t *x = desc;
+    int id = desc->i_id;
+    while (x && x->i_id != id)
+    {
+        descriptions[x->i_id] = QString::fromUtf8(x->psz_name);
+        x = x->p_next;
+    }
+
+    libvlc_track_description_list_release(desc);
+
+    return descriptions;
+}
+
 #endif // QTVLC_COMMON_P_H
