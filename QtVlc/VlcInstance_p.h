@@ -39,6 +39,8 @@ public:
     void setUserAgent(const QString &, const QString &);
 
     static VlcInstancePrivate *globalInstance();
+    static bool initGlobalInstance(const QStringList &);
+    static void freeGlobalInstance();
 };
 
 #endif // QTVLC_VLCINSTANCE_P_H

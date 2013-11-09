@@ -63,14 +63,35 @@ void VlcInstancePrivate::setUserAgent(const QString &appString, const QString &h
 VlcInstancePrivate *VlcInstancePrivate::globalInstance()
 {
     if (global == nullptr)
-#ifdef __GNUC__
-        global = new VlcInstancePrivate(QStringList());
-#else
-    {
-        global = new VlcInstancePrivate(QStringList());
-        atexit(&__Janitor__run);
-    }
-#endif
+        initGlobalInstance(QStringList());
 
     return global;
+}
+
+bool VlcInstancePrivate::initGlobalInstance(const QStringList &args)
+{
+    if (global == nullptr)
+    {
+        global = new VlcInstancePrivate(args);
+#ifndef __GNUC__
+        static bool atexit_reg = false;
+        if (!atexit_reg)
+        {
+            atexit(&__Janitor__run);
+            atexit_reg = true;
+        }
+#endif
+        return true;
+    }
+    else
+        return false;
+}
+
+void VlcInstancePrivate::freeGlobalInstance()
+{
+    if (global != nullptr)
+    {
+        global->release();
+        global = nullptr;
+    }
 }

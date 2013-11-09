@@ -87,6 +87,16 @@ libvlc_instance_t *VlcInstance::data()
     return d->data();
 }
 
+bool VlcInstance::initGlobalInstance(const QStringList &args)
+{
+    return VlcInstancePrivate::initGlobalInstance(args);
+}
+
+void VlcInstance::freeGlobalInstance()
+{
+    VlcInstancePrivate::freeGlobalInstance();
+}
+
 libvlc_instance_t *VlcInstance::globalInstance()
 {
     return VlcInstancePrivate::globalInstance()->data();

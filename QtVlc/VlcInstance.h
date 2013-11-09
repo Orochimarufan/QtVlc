@@ -29,7 +29,7 @@ class VlcInstancePrivate;
 
 /**
  * @brief The VlcInstance class
- * The Entity controlling EVERYTHING ;)
+ * The master mind ;D
  */
 class QtVlc_EXPORT VlcInstance : public QObject
 {
@@ -53,6 +53,46 @@ public:
 
     /**
      * @brief VlcInstance constructor
+     * @param args the libvlc commandline arguments
+     */
+    explicit VlcInstance(const QStringList &args);
+
+    // destructor
+    virtual ~VlcInstance();
+
+    // ----------- Options -----------
+    /**
+     * @brief Sets the application name.
+     * @param application human-readable application name, e.g. "The QtVlc Demo 1.2.3"
+     * @param version HTTP User Agent, e.g. "QtVlc-Demo/1.2.3"
+     */
+    void setUserAgent(const QString &application, const QString &http);
+
+    /**
+     * @brief Sets some meta-information about the application
+     * @param id Java-style application identifier, e.g. "me.sodimm.oro.qtvlc.testapp"
+     * @param version application version numbers, e.g. "1.2.3"
+     * @param icon_name application icon name, e.g. "video-player"
+     * @since libvlc 2.1.0
+     * TODO: stack backward-compatible with older libvlc while providing this method?
+     */
+    //void setAppId(const QString &id, const QString &version, const QString &icon_name);
+
+
+
+    // ----------- Version -----------
+    static QString libvlc_version();
+    static QString libvlc_compiler();
+    static QString libvlc_changeset();
+
+    static QString QtVlc_version();
+    static QString QtVlc_version_git();
+    static QString QtVlc_build_libvlc_version();
+    static QString QtVlc_build_qt_version();
+
+    // ----------- Global Instance -----------
+    /**
+     * @brief VlcInstance constructor
      * The global VlcInstance
      */
     VlcInstance();
@@ -63,30 +103,17 @@ public:
     static libvlc_instance_t *globalInstance();
 
     /**
-     * @brief VlcInstance constructor
-     * @param args the libvlc commandline arguments
+     * @brief Initialize the global default Instance
+     * @param args The libvlc_new arguments
+     * @return success (fails if a global instance exists already)
      */
-    explicit VlcInstance(const QStringList &args);
-
-    // destructor
-    virtual ~VlcInstance();
+    static bool initGlobalInstance(const QStringList &args);
 
     /**
-     * @brief Set the application name.
-     * @param application Human-readable application name
-     * @param version HTTP user agent
+     * @brief Drop the global default Instance
+     * This will not delete the instance if it is still referenced.
      */
-    void setUserAgent(const QString &application, const QString &http);
-
-    // version
-    static QString libvlc_version();
-    static QString libvlc_compiler();
-    static QString libvlc_changeset();
-
-    static QString QtVlc_version();
-    static QString QtVlc_version_git();
-    static QString QtVlc_build_libvlc_version();
-    static QString QtVlc_build_qt_version();
+    static void freeGlobalInstance();
 };
 
 #endif // QTVLC_VLCINSTANCE_H
