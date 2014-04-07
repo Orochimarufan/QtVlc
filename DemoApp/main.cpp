@@ -31,6 +31,7 @@ int main(int argc, char** argv)
     std::cout << "built with libvlc-" << qPrintable(VlcInstance::QtVlc_build_libvlc_version()) \
               << " Qt-" << qPrintable(VlcInstance::QtVlc_build_qt_version()) << std::endl;
     std::cout << "libvlc " << qPrintable(VlcInstance::libvlc_version()) << std::endl;
+    VlcInstance::initGlobalInstance(app.arguments());
     MainWindow win;
     win.show();
     return app.exec();

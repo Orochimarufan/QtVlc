@@ -8,8 +8,8 @@ Qt5
 
 QtVlc is Qt5 ONLY.
 
-Note that your app (as well as the demo app) will crash when the qt4 interface plugin is available to the linked libvlc library.
-Hopes are that libvlc will stop lazy-loading plugins. until then, this library is probably pretty useless :P
+Note that any Qt5 app using libvlc might crash on startup if the libvlc plugin cache is outdated and it tries to enumerate the plugins.
+This is caused by libvlc's attempt to load the Qt4 interface plugin which in turn loads Qt4 that conflicts with Qt5.
 
 License
 -------
