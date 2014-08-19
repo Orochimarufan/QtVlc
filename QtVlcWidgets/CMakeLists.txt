@@ -72,8 +72,8 @@ add_library(QtVlcWidgets SHARED ${SOURCES} ${HEADERS} ${HEADERS_PRIVATE} ${RCC})
 QT5_USE_MODULES(QtVlcWidgets Core Gui Widgets)
 target_link_libraries(QtVlcWidgets QtVlc)
 
-GET_PROPERTY(QtVlcWidgets_LIBRARY TARGET QtVlcWidgets PROPERTY LOCATION)
-SET(QtVlcWidgets_LIBRARY ${QtVlcWidgets_LIBRARY} CACHE INTERNAL "")
+#GET_PROPERTY(QtVlcWidgets_LIBRARY TARGET QtVlcWidgets PROPERTY LOCATION)
+#SET(QtVlcWidgets_LIBRARY ${QtVlcWidgets_LIBRARY} CACHE INTERNAL "")
 
 #-----------------------------------------------------------------------------
 # Install library (on windows, put the dll in 'bin' and the archive in 'lib')

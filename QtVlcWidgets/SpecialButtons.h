@@ -55,6 +55,11 @@ public Q_SLOTS:
     void updateButtonIcons(bool);
 };
 
+
+#define LB_NORMAL 0
+#define LB_REPEAT_ALL 1
+#define LB_REPEAT_ONE 2
+
 class QtVlcWidgets_EXPORT LoopButton : public QToolButton
 {
     Q_OBJECT

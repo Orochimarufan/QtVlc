@@ -84,8 +84,8 @@ IF(BUILD_VLC)
 	add_dependencies(QtVlc libvlc)
 ENDIF(BUILD_VLC)
 
-GET_PROPERTY(QtVlc_LIBRARY TARGET QtVlc PROPERTY LOCATION)
-SET(QtVlc_LIBRARY ${QtVlc_LIBRARY} CACHE INTERNAL "")
+#GET_PROPERTY(QtVlc_LIBRARY TARGET QtVlc PROPERTY LOCATION)
+#SET(QtVlc_LIBRARY ${QtVlc_LIBRARY} CACHE INTERNAL "")
 
 #-----------------------------------------------------------------------------
 # Install library (on windows, put the dll in 'bin' and the archive in 'lib')
