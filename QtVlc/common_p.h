@@ -134,13 +134,16 @@ inline QHash<int, QString> track_description(libvlc_track_description_t *desc)
 {
     QHash<int, QString> descriptions;
 
+    if (!desc)
+        return descriptions;
+
     libvlc_track_description_t *x = desc;
     int id = desc->i_id;
-    while (x && x->i_id != id)
+    do
     {
         descriptions[x->i_id] = QString::fromUtf8(x->psz_name);
         x = x->p_next;
-    }
+    } while (x && x->i_id != id);
 
     libvlc_track_description_list_release(desc);
 
