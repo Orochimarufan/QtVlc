@@ -45,6 +45,8 @@ VlcInstance &VlcInstance::operator =(const VlcInstance &o)
 
     if (d != nullptr)
         d->retain();
+    
+    return *this;
 }
 
 VlcInstance::VlcInstance(const QStringList &args) :
@@ -65,6 +67,8 @@ VlcInstance &VlcInstance::operator =(libvlc_instance_t *p)
         d->release();
 
     d = VlcInstancePrivate::instance(p);
+    
+    return *this;
 }
 
 VlcInstance::VlcInstance() :
