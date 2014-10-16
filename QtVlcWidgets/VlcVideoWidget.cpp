@@ -198,7 +198,6 @@ void VlcPrimitiveBackgroundWidget::paintEvent(QPaintEvent *e)
     QPixmap pixmap = QPixmap(_path);
     QPainter painter(this);
     QBitmap pMask;
-    float f_alpha = 1.0;
 
     i_maxwidth  = __MIN(maximumWidth(), width()) - MARGIN * 2;
     i_maxheight = __MIN(maximumHeight(), height()) - MARGIN * 2;
@@ -218,7 +217,7 @@ void VlcPrimitiveBackgroundWidget::paintEvent(QPaintEvent *e)
             pixmap.width() < width() && pixmap.height() < height())
         {
             /* Scale up the pixmap to fill widget's size */
-            f_alpha = ((float) pixmap.height() / (float) height());
+            float f_alpha = ((float) pixmap.height() / (float) height());
             pixmap = pixmap.scaled(
                     width() - MARGIN * 2,
                     height() - MARGIN * 2,
