@@ -62,6 +62,8 @@ VlcMediaListPlayer &VlcMediaListPlayer::operator =(const VlcMediaListPlayer &o)
         d->retain();
         d_connect();
     }
+    
+    return *this;
 }
 
 VlcMediaListPlayer::VlcMediaListPlayer(libvlc_media_list_player_t *p_mlp) :
@@ -85,6 +87,8 @@ VlcMediaListPlayer &VlcMediaListPlayer::operator =(libvlc_media_list_player_t *p
 
     if (d != nullptr)
         d_connect();
+    
+    return *this;
 }
 
 libvlc_media_list_player_t *VlcMediaListPlayer::data()
