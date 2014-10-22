@@ -81,8 +81,10 @@ VlcInstance::VlcInstance() :
 
 VlcInstance::~VlcInstance()
 {
-    if (d != nullptr);
+    if (d != nullptr)
+    {
         d->release();
+    }
 }
 
 libvlc_instance_t *VlcInstance::data()
