@@ -166,6 +166,8 @@ void SoundWidget::refreshLabels()
 /* volumeSlider changed value event slot */
 void SoundWidget::userUpdateVolume(int i_sliderVolume)
 {
+    Q_UNUSED(i_sliderVolume);
+    
     /* Only if volume is set by user action on slider */
     setMuted(false);
     //playlist_VolumeSet(THEPL, i_sliderVolume / 100.f);

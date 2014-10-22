@@ -193,10 +193,15 @@ bool AbstractReadOnlyMediaList::isReadOnly()
 
 void AbstractReadOnlyMediaList::insert(int index, const VlcMedia &media)
 {
+    Q_UNUSED(index);
+    Q_UNUSED(media);
+    
     throw new ReadOnly;
 }
 
 void AbstractReadOnlyMediaList::removeAt(int index)
 {
+    Q_UNUSED(index);
+    
     throw new ReadOnly;
 }

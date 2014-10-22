@@ -94,6 +94,8 @@ void VlcVideoWidget::sync()
  **/
 WId VlcVideoWidget::request(bool b_keep_size, unsigned int width, unsigned int height)
 {
+    Q_UNUSED(b_keep_size);
+    
     // TODO sizing
     qDebug("Video was requested %i, %i", width, height );
 
