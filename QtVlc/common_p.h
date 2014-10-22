@@ -41,7 +41,7 @@ public:
         ref.ref();
     }
 
-    inline bool release()
+    inline void release()
     {
         if (!ref.deref())
             delete this;
