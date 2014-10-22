@@ -300,6 +300,8 @@ VlcState::Type VlcMediaPlayerPrivate::state()
 {
     if (d)
         return static_cast<VlcState::Type>(libvlc_media_player_get_state(d));
+    else
+        return VlcState::Error;
 }
 
 // Audio
