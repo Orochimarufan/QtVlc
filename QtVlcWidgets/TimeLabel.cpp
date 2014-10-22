@@ -55,9 +55,9 @@
 
 
 TimeLabel::TimeLabel(QWidget *parent, TimeLabel::Display _displayType)
-    : ClickableQLabel(parent),  bufTimer(new QTimer(this)),
-      buffering(false), showBuffering(false), bufVal(-1),
-      displayType(_displayType), b_remainingTime(false)
+    : ClickableQLabel(parent), b_remainingTime(false),
+      bufTimer(new QTimer(this)), buffering(false), showBuffering(false), 
+      bufVal(-1), displayType(_displayType)
 {
     //if(_displayType != TimeLabel::Elapsed)
         //b_remainingTime = getSettings()->value("MainWindow/ShowRemainingTime", false).toBool();
