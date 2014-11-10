@@ -18,7 +18,6 @@
 
 #include "VlcMediaPlayer_p.h"
 #include "VlcError.h"
-#include "VlcError.h"
 
 VLC_WRAPPER_IMPL_CPP2(VlcMediaPlayerPrivate, libvlc_media_player_t,
                       libvlc_media_player, attach_events, detach_events)
