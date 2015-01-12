@@ -98,7 +98,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/inc)
 
 ###### build ######
 include_directories(${PROJECT_SOURCE_DIR}/include)
-
+add_definitions(-Wall -Wextra)
 add_subdirectory(QtVlc)
 add_subdirectory(QtVlcWidgets)
 add_subdirectory(DemoApp EXCLUDE_FROM_ALL)
